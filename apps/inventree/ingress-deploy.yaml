@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: inventree-ip-access
+  namespace: inventree
+  annotations:
+z    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:              # <-- нет поля "host" вообще — значит матчит ЛЮБОЙ Host-заголовок
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: inventree
+                port:
+                  number: 8000

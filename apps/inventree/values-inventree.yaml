@@ -1,0 +1,66 @@
+replicaCount: 1
+
+strategy:
+  type: Recreate
+
+global:
+  siteUrl: "https://rp.store"
+
+  adminSecret: "inventree-admin-secret"
+
+  dbSecrets:
+    - name: INVENTREE_DB_ENGINE
+      value: "postgresql"
+    - name: INVENTREE_DB_HOST
+      value: "postgres.inventree.svc.cluster.local"
+    - name: INVENTREE_DB_PORT
+      value: "5432"
+    - name: INVENTREE_DB_NAME
+      value: "inventree"
+    - name: INVENTREE_DB_USER
+      value: "inventree"
+    - name: INVENTREE_DB_PASSWORD
+      value: "inventree"
+
+  cacheSecrets:
+    - name: INVENTREE_CACHE_HOST
+      value: "redis.inventree.svc.cluster.local"
+    - name: INVENTREE_CACHE_PORT
+      value: "6379"
+    - name: INVENTREE_CACHE_PASSWORD
+      value: "redis"
+
+  initEnabled: true
+
+env:
+  INVENTREE_ALLOWED_HOSTS: "*"
+  INVENTREE_CORS_ORIGIN_WHITELIST: "http://rp.store, https://rp.store,http://192.168.5.87"
+  INVENTREE_CSRF_TRUSTED_ORIGINS: "http://rp.store, https://rp.store,http://192.168.5.87"
+  INVENTREE_PUBLIC_ACCESS: "True"
+  INVENTREE_FRONTEND_SETTINGS: '{"mobile_mode": "allow-always"}'
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    hosts:
+      - host: rp.store
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: inventree-tls
+        hosts:
+          - rp.store 
+
+persistence:
+  enabled: true
+  storageClass: local-path
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  mountPath: /home/inventree/data
+  
+
