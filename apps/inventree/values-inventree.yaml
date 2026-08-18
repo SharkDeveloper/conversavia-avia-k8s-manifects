@@ -62,5 +62,10 @@ persistence:
   accessMode: ReadWriteOnce
   size: 10Gi
   mountPath: /home/inventree/data
-  
+
+# Образ, собранный из форка rp.store (см. CI docker-image.yml -> ghcr.io)
+image:
+  repository: ghcr.io/sharkdeveloper/rp.store/inventree
+  pullPolicy: IfNotPresent
+  tag: "latest"
 
