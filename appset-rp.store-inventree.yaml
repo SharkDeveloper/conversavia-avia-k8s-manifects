@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: rp.store-inventree
+  namespace: argocd
+spec:
+  # ApplicationSet для Helm-компонента InvenTree.
+  # Использует Helm-чарт inventree/inventree и переопределения values-inventree.yaml.
+  generators:
+    - list:
+        elements:
+          - name: inventree
+  template:
+    metadata:
+      name: "{{ .name }}"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
+        targetRevision: HEAD
+        path: apps/inventree
+        chart: inventree/inventree
+        helm:
+          valueFiles:
+            - values-inventree.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: inventree
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m

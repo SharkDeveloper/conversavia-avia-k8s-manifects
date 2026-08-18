@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: rp.store
+  namespace: argocd
+spec:
+  # ApplicationSet для Kustomize-компонентов платформы InvenTree.
+  # PostgreSQL и Redis управляются из единого шаблона.
+  # (Helm-компонент InvenTree вынесен в appset-rp.store-inventree.yaml,
+  #  т.к. у него другой тип source и отдельные values.)
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  generators:
+    - list:
+        elements:
+          - name: postgres
+            path: apps/postgres
+          - name: redis
+            path: apps/redis
+  template:
+    metadata:
+      name: "{{ .name }}"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
+        targetRevision: HEAD
+        path: "{{ .path }}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: inventree
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
