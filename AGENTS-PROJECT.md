@@ -89,8 +89,9 @@ conversavia-avia-k8s-manifects/
 ├── README.md                       # пользовательская инструкция
 ├── AGENTS-PROJECT.md               # этот файл: общее описание проекта
 ├── AGENTS-REFERENCE.md             # точечная техническая справка (образы, репозитории)
-├── appset-rp.store.yaml            # ApplicationSet: postgres + redis (Kustomize)
-├── appset-rp.store-inventree.yaml  # ApplicationSet: inventree (Helm)
+├── apps-of-apps/                   # корневой уровень: ApplicationSet'ы (App of Apps)
+│   ├── appset-rp.store.yaml        # ApplicationSet: postgres + redis (Kustomize)
+│   └── appset-rp.store-inventree.yaml  # ApplicationSet: inventree (Helm)
 └── apps/
     ├── inventree/                  # InvenTree (Helm-чарт)
     │   ├── values-inventree.yaml           # реальные переопределения под кластер
@@ -106,7 +107,7 @@ conversavia-avia-k8s-manifects/
         └── redis.yaml               # Secret + PVC + Deployment + Service
 ```
 
-> **Принцип:** один компонент = одна папка в `apps/` = один Application в ArgoCD.
+> **Принцип:** один компонент = одна папка в `apps/` = один Application в ArgoCD. Application'ы генерируются автоматически из `apps-of-apps/` через ApplicationSet.
 
 ---
 
@@ -134,13 +135,20 @@ conversavia-avia-k8s-manifects/
 
 ## 8. Как запустить
 
-1. Подключите репозитории в ArgoCD (см. справку).
-2. Примените ApplicationSet (или корневой App of Apps):
-   ```bash
-   kubectl apply -f appset-rp.store.yaml -n argocd
-   kubectl apply -f appset-rp.store-inventree.yaml -n argocd
-   ```
-3. Дождитесь статуса **Synced / Healthy** для `inventree`, `postgres`, `redis`.
+Система запускается **двумя способами** — подробное описание, команды и сравнение см. в разделе «[Два способа запуска системы](AGENTS-REFERENCE.md#9-два-способа-запуска-системы)» технической справки.
+
+### Способ 1 — CLI (`kubectl apply`)
+
+```bash
+kubectl apply -f apps-of-apps/appset-rp.store.yaml -n argocd
+kubectl apply -f apps-of-apps/appset-rp.store-inventree.yaml -n argocd
+```
+
+### Способ 2 — App of Apps (GitOps, рекомендован)
+
+Корневой Application `rp.store-root` отслеживает папку `apps-of-apps/` с ApplicationSet'ами и запускает весь стек одной кнопкой **Sync** в GUI.
+
+После любого способа дождитесь статуса **Synced / Healthy** для `inventree`, `postgres`, `redis`.
 
 ---
 
