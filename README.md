@@ -12,7 +12,7 @@
 
 | Компонент | Роль | Образ | Способ управления |
 |---|---|---|---|
-| **InvenTree** | Веб-приложение | `inventree/inventree` | Helm-чарт |
+| **InvenTree** | Веб-приложение | `ghcr.io/sharkdeveloper/rp.store/inventree` | Helm-чарт |
 | **PostgreSQL** | База данных | `postgres:15-alpine` | Kustomize |
 | **Redis** | Кеш | `redis:7-alpine` | Kustomize |
 
@@ -20,7 +20,12 @@
 
 ```
 conversavia-avia-k8s-manifects/
-├── README.md
+├── README.md                         # пользовательская инструкция
+├── AGENTS-PROJECT.md                 # общее описание проекта (для ИИ-агентов)
+├── AGENTS-REFERENCE.md               # техническая справка (образы, репозитории)
+├── apps-of-apps/                     # корневой уровень: ApplicationSet'ы
+│   ├── appset-rp.store.yaml          # ApplicationSet: postgres + redis (Kustomize)
+│   └── appset-rp.store-inventree.yaml# ApplicationSet: inventree (Helm)
 └── apps/
     ├── inventree/                     # InvenTree (Helm-чарт)
     │   ├── values-inventree.yaml      # реальные переопределения под кластер
@@ -36,7 +41,7 @@ conversavia-avia-k8s-manifects/
         └── redis.yaml                 # Secret + PVC + Deployment + Service
 ```
 
-> **Принцип:** один компонент = одна папка в `apps/` = один Application в ArgoCD. Каждый компонент синхронизируется независимо.
+> **Принцип:** один компонент = одна папка в `apps/` = один Application в ArgoCD. Application'ы генерируются автоматически из `apps-of-apps/` через ApplicationSet.
 
 ## Требования
 
@@ -56,43 +61,34 @@ conversavia-avia-k8s-manifects/
    - при необходимости — `Username` / `Password` или SSH-ключ
 4. **Test Connection** → сохраните.
 
-### Шаг 2. Создайте Application через GUI
+### Шаг 2. Создайте корневой Application (App of Apps) через GUI
 
-Для **PostgreSQL** и **Redis** (тип **Directory/Kustomize**):
+Ручное создание трёх Application **не требуется** — они генерируются автоматически из ApplicationSet в папке [`apps-of-apps/`](apps-of-apps). Достаточно создать **один** корневой Application:
 
 | Поле | Значение |
 |---|---|
-| Application name | `postgres` / `redis` |
+| Application name | `rp.store-root` |
 | Project | `default` |
 | Sync Policy | `Automatic` |
-| Repository URL | этот репозиторий |
+| Repository URL | URL этого репозитория |
 | Revision | `HEAD` |
-| Path | `apps/postgres` / `apps/redis` |
+| Path | `apps-of-apps` |
 | Cluster URL | локальный кластер |
-| Namespace | `inventree` |
+| Namespace | `argocd` (⚠️ обязательно) |
 
 Включите опции **Prune** и **Self Heal** (вкладка *Sync Options*).
 
-Для **InvenTree** (тип **Helm**):
-
-| Поле | Значение |
-|---|---|
-| Application name | `inventree` |
-| Project | `default` |
-| Sync Policy | `Automatic` |
-| Repository URL | этот репозиторий |
-| Revision | `HEAD` |
-| Path | `apps/inventree` |
-| Release Name | `inventree` |
-| Chart | `inventree/inventree` |
-| Values | `values-inventree.yaml` |
-| Namespace | `inventree` |
-
-После создания ArgoCD применит манифесты и начнёт синхронизировать кластер с репозиторием.
+После **Sync** корневой Application применит оба ApplicationSet, которые сгенерируют Application `inventree`, `postgres`, `redis`.
 
 ### Шаг 3. Проверка
 
-В GUI ArgoCD должны появиться 3 Application (`inventree`, `postgres`, `redis`) со статусом **Synced / Healthy**. В кластере должен существовать неймспейс `inventree` с развёрнутыми подами.
+В GUI ArgoCD должны появиться 4 Application (`rp.store-root`, `inventree`, `postgres`, `redis`) со статусом **Synced / Healthy**. В кластере должен существовать неймспейс `inventree` с развёрнутыми подами.
+
+> 💡 **Альтернатива (быстрый запуск):** можно применить ApplicationSet напрямую из CLI:
+> ```bash
+> kubectl apply -f apps-of-apps/appset-rp.store.yaml -n argocd
+> kubectl apply -f apps-of-apps/appset-rp.store-inventree.yaml -n argocd
+> ```
 
 ## Обновление образов из CI (CI → CD)
 
@@ -101,7 +97,7 @@ conversavia-avia-k8s-manifects/
 Добавьте на Application `inventree` следующие аннотации:
 
 ```yaml
-argocd-image-updater.argoproj.io/image-list: inventree=inventree/inventree
+argocd-image-updater.argoproj.io/image-list: inventree=ghcr.io/sharkdeveloper/rp.store/inventree
 argocd-image-updater.argoproj.io/inventree.update-strategy: latest
 argocd-image-updater.argoproj.io/inventree.write-back-method: git
 ```
@@ -118,8 +114,9 @@ argocd-image-updater.argoproj.io/inventree.write-back-method: git
 1. Создайте папку `apps/<service>/` с манифестами.
 2. Добавьте `kustomization.yaml` (для YAML-манифестов) или values (для Helm-чарта).
 3. Укажите `namespace: inventree` в манифестах.
-4. Создайте новый Application в GUI ArgoCD (см. Шаг 2 выше), указав `Path: apps/<service>`.
-5. При необходимости добавьте аннотации Image Updater для автообновления образа.
+4. Добавьте элемент в `list.elements` в [`apps-of-apps/appset-rp.store.yaml`](apps-of-apps/appset-rp.store.yaml:1).
+5. Запушьте изменения — ArgoCD сам создаст новый Application из ApplicationSet (ручное создание в GUI не требуется).
+6. При необходимости добавьте аннотации Image Updater для автообновления образа.
 
 ## Примечания и известные ограничения
 
