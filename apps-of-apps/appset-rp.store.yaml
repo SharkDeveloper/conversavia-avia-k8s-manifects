@@ -20,7 +20,7 @@ spec:
             path: apps/redis
   template:
     metadata:
-      name: "{{ .name }}"
+      name: "{{ name }}"
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:
