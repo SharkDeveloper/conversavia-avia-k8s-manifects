@@ -5,7 +5,8 @@ metadata:
   namespace: argocd
 spec:
   # ApplicationSet для Helm-компонента InvenTree.
-  # Использует Helm-чарт inventree/inventree и переопределения values-inventree.yaml.
+  # Использует Helm-чарт из папки apps/inventree в этом же Git-репозитории
+  # и переопределения values-inventree.yaml.
   generators:
     - list:
         elements:
@@ -21,7 +22,6 @@ spec:
         repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
         targetRevision: HEAD
         path: apps/inventree
-        chart: inventree/inventree
         helm:
           valueFiles:
             - values-inventree.yaml
