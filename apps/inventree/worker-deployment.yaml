@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventree-worker
+  namespace: inventree
+  labels:
+    app.kubernetes.io/instance: inventree
+    app.kubernetes.io/name: inventree-worker
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: inventree
+      app.kubernetes.io/name: inventree-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: inventree
+        app.kubernetes.io/name: inventree-worker
+    spec:
+      serviceAccountName: inventree
+      containers:
+        - name: inventree
+          image: inventree/inventree:1.4.3
+          imagePullPolicy: IfNotPresent
+          command: ["invoke", "worker"]
+          env:
+            - name: INVENTREE_SITE_URL
+              value: http://rp.store
+            - name: INVENTREE_ALLOWED_HOSTS
+              value: '*'
+            - name: INVENTREE_CORS_ORIGIN_WHITELIST
+              value: "http://rp.store, https://rp.store,http://192.168.5.87"
+            - name: INVENTREE_CSRF_TRUSTED_ORIGINS
+              value: "http://rp.store, https://rp.store,http://192.168.5.87"
+            - name: INVENTREE_FRONTEND_SETTINGS
+              value: '{"mobile_mode": "allow-always"}'
+            - name: INVENTREE_PUBLIC_ACCESS
+              value: "True"
+            - name: INVENTREE_CACHE_ENABLED
+              value: "True"
+            - name: INVENTREE_PLUGINS_ENABLED
+              value: "True"
+            - name: INVENTREE_CACHE_HOST
+              value: redis.inventree.svc.cluster.local
+            - name: INVENTREE_CACHE_PORT
+              value: "6379"
+            - name: INVENTREE_CACHE_PASSWORD
+              value: redis
+            - name: INVENTREE_DB_ENGINE
+              value: postgresql
+            - name: INVENTREE_DB_HOST
+              value: postgres.inventree.svc.cluster.local
+            - name: INVENTREE_DB_PORT
+              value: "5432"
+            - name: INVENTREE_DB_NAME
+              value: inventree
+            - name: INVENTREE_DB_USER
+              value: inventree
+            - name: INVENTREE_DB_PASSWORD
+              value: inventree
+          volumeMounts:
+            - name: inventree-data
+              mountPath: /home/inventree/data
+      volumes:
+        - name: inventree-data
+          persistentVolumeClaim:
+            claimName: inventree-data

@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: inventree
+  namespace: inventree
+  labels:
+    app.kubernetes.io/instance: inventree
+    app.kubernetes.io/name: inventree
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: rp.store
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: inventree
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - rp.store
+      secretName: inventree-tls
