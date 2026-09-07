@@ -4,9 +4,9 @@ metadata:
   name: rp.store-inventree
   namespace: argocd
 spec:
-  # ApplicationSet для Helm-компонента InvenTree.
-  # Использует Helm-чарт из папки apps/inventree в этом же Git-репозитории
-  # и переопределения values-inventree.yaml.
+  # ApplicationSet для компонента InvenTree.
+  # Использует чистые Kubernetes-манифесты (Kustomize) из папки apps/inventree
+  # в этом же Git-репозитории (без Helm-чарта — вендоринг был заменён на plain YAML).
   generators:
     - list:
         elements:
@@ -22,9 +22,6 @@ spec:
         repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
         targetRevision: HEAD
         path: apps/inventree
-        helm:
-          valueFiles:
-            - values-inventree.yaml
       destination:
         server: https://kubernetes.default.svc
         namespace: inventree
