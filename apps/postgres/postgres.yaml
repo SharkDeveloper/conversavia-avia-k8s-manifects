@@ -5,9 +5,12 @@ metadata:
   namespace: inventree
 type: Opaque
 stringData:
-  POSTGRES_USER: inventree
-  POSTGRES_PASSWORD: inventree
-  POSTGRES_DB: inventree
+  INVENTREE_DB_ENGINE: postgresql
+  INVENTREE_DB_HOST: postgres.inventree.svc.cluster.local
+  INVENTREE_DB_PORT: "5432"
+  INVENTREE_DB_NAME: inventree
+  INVENTREE_DB_USER: inventree
+  INVENTREE_DB_PASSWORD: inventree
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
