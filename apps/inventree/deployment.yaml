@@ -52,12 +52,6 @@ spec:
               value: postgres.inventree.svc.cluster.local
             - name: INVENTREE_DB_PORT
               value: "5432"
-            - name: INVENTREE_DB_NAME
-              value: inventree
-            - name: INVENTREE_DB_USER
-              value: inventree
-            - name: INVENTREE_DB_PASSWORD
-              value: inventree
           volumeMounts:
             - name: inventree-data
               mountPath: /home/inventree/data
