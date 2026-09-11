@@ -6,7 +6,7 @@ metadata:
 type: Opaque
 stringData:
   POSTGRES_USER: inventree
-  POSTGRES_PASSWORD: inventree
+  POSTGRES_PASSWORD: postgres
   POSTGRES_DB: inventree
 ---
 apiVersion: v1
