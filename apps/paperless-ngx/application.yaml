@@ -11,7 +11,7 @@ spec:
     # Источник 1: Helm-чарт
     - repoURL: https://helm.crystalnet.org
       chart: paperless-ngx
-      targetRevision: "0.2.23"
+      targetRevision: "0.2.14"
       helm:
         valueFiles:
           - $values/apps/paperless-ngx/values.yaml
