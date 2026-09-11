@@ -14,7 +14,15 @@ env:
     value: "Europe/Moscow"
   - name: PAPERLESS_OCR_LANGUAGE
     value: "eng+rus"
-
+    
+  # --- Tika и Gotenberg для поддержки Office-документов ---
+  - name: PAPERLESS_TIKA_ENABLED
+    value: "true"
+  - name: PAPERLESS_TIKA_ENDPOINT
+    value: "http://paperless-tika:9998"
+  - name: PAPERLESS_TIKA_GOTENBERG_ENDPOINT
+    value: "http://paperless-gotenberg:3000"
+    
   # --- Redis (создаём вручную через extraObjects) ---
   - name: PAPERLESS_REDIS
     value: "redis://paperless-redis:6379"
