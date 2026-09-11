@@ -9,7 +9,7 @@ spec:
   project: default
   sources:
     # Источник 1: Helm-чарт
-    - repoURL: oci://harbor.crystalnet.org/charts
+    - repoURL: https://helm.crystalnet.org
       chart: paperless-ngx
       targetRevision: "0.2.23"
       helm:
