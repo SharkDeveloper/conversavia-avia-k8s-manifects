@@ -4,21 +4,32 @@ metadata:
   name: rp.store-paperless-ngx
   namespace: argocd
 spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
   generators:
     - list:
         elements:
           - name: paperless-ngx
   template:
     metadata:
-      name: "rp.store-paperless-ngx"
+      name: "{{ .name }}"
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:
       project: default
-      source:
-        repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
-        targetRevision: HEAD
-        path: apps/paperless-ngx
+      sources:
+        # Источник 1: Helm-чарт pascaliske
+        - repoURL: https://pascaliske.github.io/helm-charts
+          chart: paperless
+          targetRevision: "7.0.0"
+          helm:
+            valueFiles:
+              - $values/apps/paperless-ngx/values.yaml
+        # Источник 2: Ваш Git-репозиторий ТОЛЬКО для values
+        - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
+          targetRevision: HEAD
+          ref: values
       destination:
         server: https://kubernetes.default.svc
         namespace: paperless-ngx
