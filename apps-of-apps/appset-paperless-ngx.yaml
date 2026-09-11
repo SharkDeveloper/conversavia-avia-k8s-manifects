@@ -18,7 +18,7 @@ spec:
         - resources-finalizer.argocd.argoproj.io
     spec:
       project: default
-      sources:                                    # ← МНОЖЕСТВЕННОЕ число
+      sources:
         - repoURL: https://pascaliske.github.io/helm-charts
           chart: paperless
           targetRevision: "7.0.0"
@@ -27,7 +27,7 @@ spec:
               - $values/apps/paperless-ngx/values.yaml
         - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
           targetRevision: HEAD
-          ref: values                             # ← псевдоним для $values
+          ref: values
       destination:
         server: https://kubernetes.default.svc
         namespace: paperless-ngx
