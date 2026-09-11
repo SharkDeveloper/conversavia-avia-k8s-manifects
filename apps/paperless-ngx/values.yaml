@@ -1,29 +1,19 @@
+# apps/paperless-ngx/values.yaml
+
+# --- Переменные окружения Paperless ---
 env:
-  # Основные настройки
   - name: PAPERLESS_URL
     value: "http://192.168.5.87:30800"
   - name: PAPERLESS_TIME_ZONE
     value: "Europe/Moscow"
   - name: PAPERLESS_OCR_LANGUAGE
     value: "eng+rus"
-  - name: PAPERLESS_OCR_MODE
-    value: "skip"
-  - name: PAPERLESS_CONSUMER_RECURSIVE
-    value: "true"
 
-  # Пароль администратора (создаётся чартом)
-  - name: PAPERLESS_ADMIN_USER
-    value: "admin"
-  - name: PAPERLESS_ADMIN_PASSWORD
-    value: "admin"
-  - name: PAPERLESS_ADMIN_MAIL
-    value: "admin@example.com"
+  # --- Redis (создаём вручную через extraObjects) ---
+  - name: PAPERLESS_REDIS
+    value: "redis://paperless-redis:6379"
 
-  # Секретный ключ Django (ОБЯЗАТЕЛЬНО смените в продакшене)
-  - name: PAPERLESS_SECRET_KEY
-    value: "здесь_должна_быть_длинная_случайная_строка"
-
-  # --- Настройки базы данных (PostgreSQL) ---
+  # --- PostgreSQL (зависимость чарта, создаётся автоматически) ---
   - name: PAPERLESS_DBHOST
     value: "paperless-ngx-postgresql"
   - name: PAPERLESS_DBPORT
@@ -35,20 +25,19 @@ env:
   - name: PAPERLESS_DBPASS
     value: "paperless"
 
-  # --- Настройки Redis (ОБЯЗАТЕЛЬНО для работы) ---
-  - name: PAPERLESS_REDIS
-    value: "redis://paperless-ngx-redis:6379"
+  # --- Администратор ---
+  - name: PAPERLESS_ADMIN_USER
+    value: "admin"
+  - name: PAPERLESS_ADMIN_PASSWORD
+    value: "admin"
+  - name: PAPERLESS_ADMIN_MAIL
+    value: "admin@example.com"
 
-  # --- Настройки Tika и Gotenberg (для Office и Email файлов) ---
-  - name: PAPERLESS_TIKA_ENABLED
-    value: "true"
-  - name: PAPERLESS_TIKA_ENDPOINT
-    value: "http://paperless-ngx-tika:9998"
-  - name: PAPERLESS_TIKA_GOTENBERG_ENDPOINT
-    value: "http://paperless-ngx-gotenberg:3000"
+  # --- Секретный ключ Django (сгенерирован) ---
+  - name: PAPERLESS_SECRET_KEY
+    value: "xK9mP2vL8nQ4wR7tY1uI5oA3sD6fG0hJ2kM9bV4cX8zN1pL7qW3eR5tY2uI6oA"
 
-# --- Включаем подчарты зависимостей ---
-# Эти сервисы будут развернуты внутри вашего namespace 'paperless-ngx'
+# --- Включаем PostgreSQL (создаётся чартом автоматически) ---
 postgresql:
   enabled: true
   auth:
@@ -56,22 +45,12 @@ postgresql:
     username: "paperless"
     password: "paperless"
 
-redis:
-  enabled: true
-
-# Tika и Gotenberg (включаем для поддержки Office-документов)
-tika:
-  enabled: true
-
-gotenberg:
-  enabled: true
-
-# --- Настройки доступа (NodePort) ---
+# --- Настройки доступа ---
 service:
   type: NodePort
   nodePort: 30800
 
-# --- Хранилище (использует default StorageClass) ---
+# --- Хранилище ---
 persistence:
   data:
     enabled: true
@@ -85,3 +64,37 @@ persistence:
       resources:
         requests:
           storage: "20Gi"
+
+# --- Redis: Deployment + Service через extraObjects ---
+extraObjects:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: paperless-redis
+      namespace: paperless-ngx
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: paperless-redis
+      template:
+        metadata:
+          labels:
+            app: paperless-redis
+        spec:
+          containers:
+            - name: redis
+              image: redis:7-alpine
+              ports:
+                - containerPort: 6379
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: paperless-redis
+      namespace: paperless-ngx
+    spec:
+      selector:
+        app: paperless-redis
+      ports:
+        - port: 6379
+          targetPort: 6379
