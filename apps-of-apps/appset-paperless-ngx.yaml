@@ -1,46 +1,167 @@
-apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
-metadata:
-  name: rp.store-paperless-ngx
-  namespace: argocd
-spec:
-  goTemplate: true
-  goTemplateOptions:
-    - missingkey=error
-  generators:
-    - list:
-        elements:
-          - name: paperless-ngx
-  template:
+# apps/paperless-ngx/values.yaml
+
+# --- Переменные окружения Paperless ---
+env:
+  - name: PAPERLESS_URL
+    value: "http://192.168.5.87:30800"
+  - name: PAPERLESS_TIME_ZONE
+    value: "Europe/Moscow"
+  # Используем оба языка для OCR
+  - name: PAPERLESS_OCR_LANGUAGE
+    value: "eng+rus"
+  # Доустанавливаем русский языковой пакет при старте
+  - name: PAPERLESS_OCR_LANGUAGES
+    value: "rus"
+
+  # --- Redis (создаём вручную) ---
+  - name: PAPERLESS_REDIS
+    value: "redis://paperless-redis:6379"
+
+  # --- PostgreSQL (создаём вручную) ---
+  - name: PAPERLESS_DBHOST
+    value: "paperless-postgresql"
+  - name: PAPERLESS_DBPORT
+    value: "5432"
+  - name: PAPERLESS_DBNAME
+    value: "paperless"
+  - name: PAPERLESS_DBUSER
+    value: "paperless"
+  - name: PAPERLESS_DBPASS
+    value: "paperless"
+
+  # --- Администратор ---
+  - name: PAPERLESS_ADMIN_USER
+    value: "admin"
+  - name: PAPERLESS_ADMIN_PASSWORD
+    value: "admin"
+  - name: PAPERLESS_ADMIN_MAIL
+    value: "admin@example.com"
+
+  # --- Секретный ключ ---
+  - name: PAPERLESS_SECRET_KEY
+    value: "xK9mP2vL8nQ4wR7tY1uI5oA3sD6fG0hJ2kM9bV4cX8zN1pL7qW3eR5tY2uI6oA"
+
+# --- Права доступа (исправляет Permission issue) ---
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+# --- Отключаем встроенный PostgreSQL ---
+postgresql:
+  enabled: false
+
+# --- Настройки доступа ---
+service:
+  type: NodePort
+  # Чарт игнорирует nodePort, поэтому Kubernetes выдаст случайный.
+  # Актуальный порт смотрите через: kubectl get svc -n paperless-ngx
+  nodePort: 30800
+
+# --- Хранилище ---
+persistence:
+  data:
+    enabled: true
+    volumeClaimSpec:
+      resources:
+        requests:
+          storage: "5Gi"
+  media:
+    enabled: true
+    volumeClaimSpec:
+      resources:
+        requests:
+          storage: "20Gi"
+
+# --- Redis + PostgreSQL через extraObjects ---
+extraObjects:
+  # ---------- REDIS ----------
+  - apiVersion: apps/v1
+    kind: Deployment
     metadata:
-      name: "{{ .name }}"
-      finalizers:
-        - resources-finalizer.argocd.argoproj.io
+      name: paperless-redis
+      namespace: paperless-ngx
     spec:
-      project: default
-      sources:                                    # ← МНОЖЕСТВЕННОЕ число
-        - repoURL: https://pascaliske.github.io/helm-charts
-          chart: paperless
-          targetRevision: "7.0.0"
-          helm:
-            valueFiles:
-              - $values/apps/paperless-ngx/values.yaml
-        - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
-          targetRevision: HEAD
-          ref: values                             # ← псевдоним для $values
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: paperless-ngx
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-          allowEmpty: false
-        syncOptions:
-          - CreateNamespace=true
-        retry:
-          limit: 5
-          backoff:
-            duration: 5s
-            factor: 2
-            maxDuration: 3m
+      replicas: 1
+      selector:
+        matchLabels:
+          app: paperless-redis
+      template:
+        metadata:
+          labels:
+            app: paperless-redis
+        spec:
+          containers:
+            - name: redis
+              image: redis:7-alpine
+              ports:
+                - containerPort: 6379
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: paperless-redis
+      namespace: paperless-ngx
+    spec:
+      selector:
+        app: paperless-redis
+      ports:
+        - port: 6379
+          targetPort: 6379
+
+  # ---------- POSTGRESQL ----------
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: paperless-postgresql-data
+      namespace: paperless-ngx
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: paperless-postgresql
+      namespace: paperless-ngx
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: paperless-postgresql
+      template:
+        metadata:
+          labels:
+            app: paperless-postgresql
+        spec:
+          containers:
+            - name: postgres
+              image: postgres:16-alpine
+              ports:
+                - containerPort: 5432
+              env:
+                - name: POSTGRES_DB
+                  value: "paperless"
+                - name: POSTGRES_USER
+                  value: "paperless"
+                - name: POSTGRES_PASSWORD
+                  value: "paperless"
+              volumeMounts:
+                - name: data
+                  mountPath: /var/lib/postgresql/data
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: paperless-postgresql-data
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: paperless-postgresql
+      namespace: paperless-ngx
+    spec:
+      selector:
+        app: paperless-postgresql
+      ports:
+        - port: 5432
+          targetPort: 5432
