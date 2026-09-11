@@ -1,21 +1,77 @@
-# apps/paperless-ngx/values.yaml
+env:
+  # Основные настройки
+  - name: PAPERLESS_URL
+    value: "http://192.168.5.87:30800"
+  - name: PAPERLESS_TIME_ZONE
+    value: "Europe/Moscow"
+  - name: PAPERLESS_OCR_LANGUAGE
+    value: "eng+rus"
+  - name: PAPERLESS_OCR_MODE
+    value: "skip"
+  - name: PAPERLESS_CONSUMER_RECURSIVE
+    value: "true"
 
-config:
-  paperless_url: "http://192.168.5.87:30800"
+  # Пароль администратора (создаётся чартом)
+  - name: PAPERLESS_ADMIN_USER
+    value: "admin"
+  - name: PAPERLESS_ADMIN_PASSWORD
+    value: "admin123"
+  - name: PAPERLESS_ADMIN_MAIL
+    value: "admin@example.com"
+
+  # Секретный ключ Django (ОБЯЗАТЕЛЬНО смените в продакшене)
+  - name: PAPERLESS_SECRET_KEY
+    value: "здесь_должна_быть_длинная_случайная_строка"
+
+  # --- Настройки базы данных (PostgreSQL) ---
+  - name: PAPERLESS_DBHOST
+    value: "paperless-ngx-postgresql"
+  - name: PAPERLESS_DBPORT
+    value: "5432"
+  - name: PAPERLESS_DBNAME
+    value: "paperless"
+  - name: PAPERLESS_DBUSER
+    value: "paperless"
+  - name: PAPERLESS_DBPASS
+    value: "paperless-db-pass"
+
+  # --- Настройки Redis (ОБЯЗАТЕЛЬНО для работы) ---
+  - name: PAPERLESS_REDIS
+    value: "redis://paperless-ngx-redis:6379"
+
+  # --- Настройки Tika и Gotenberg (для Office и Email файлов) ---
+  - name: PAPERLESS_TIKA_ENABLED
+    value: "true"
+  - name: PAPERLESS_TIKA_ENDPOINT
+    value: "http://paperless-ngx-tika:9998"
+  - name: PAPERLESS_TIKA_GOTENBERG_ENDPOINT
+    value: "http://paperless-ngx-gotenberg:3000"
+
+# --- Включаем подчарты зависимостей ---
+# Эти сервисы будут развернуты внутри вашего namespace 'paperless-ngx'
+postgresql:
+  enabled: true
   auth:
-    existing_secret: "paperless-ngx-secret"
-  ocr_languages: ["eng", "rus"]
-  time_zone: "Europe/Moscow"
+    database: "paperless"
+    username: "paperless"
+    password: "paperless-db-pass"
 
+redis:
+  enabled: true
+
+# Tika и Gotenberg (включаем для поддержки Office-документов)
+tika:
+  enabled: true
+
+gotenberg:
+  enabled: true
+
+# --- Настройки доступа (NodePort) ---
 service:
   type: NodePort
   nodePort: 30800
 
-config.ftpd:
-  enabled: true
-  public_ip: "192.168.5.87"
-  service_type: "NodePort"
-
+# --- Хранилище (использует default StorageClass) ---
 persistence:
   data:
     enabled: true
@@ -29,13 +85,3 @@ persistence:
       resources:
         requests:
           storage: "20Gi"
-
-postgresql:
-  enabled: true
-  auth:
-    database: "paperless"
-    username: "paperless"
-    password: "paperless"
-
-valkey:
-  enabled: true
