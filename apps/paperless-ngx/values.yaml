@@ -2,7 +2,7 @@
 
 # --- Ваш собственный образ с русским языком ---
 image:
-  repository: your-registry/paperless-ngx-rus
+  repository: ghcr.io/sharkdeveloper/conversavia-avia-k8s-manifects/paperless-ngx-rus
   tag: "latest"
   pullPolicy: Always
 
