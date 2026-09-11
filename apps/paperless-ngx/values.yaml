@@ -15,7 +15,7 @@ env:
   - name: PAPERLESS_ADMIN_USER
     value: "admin"
   - name: PAPERLESS_ADMIN_PASSWORD
-    value: "admin123"
+    value: "admin"
   - name: PAPERLESS_ADMIN_MAIL
     value: "admin@example.com"
 
@@ -33,7 +33,7 @@ env:
   - name: PAPERLESS_DBUSER
     value: "paperless"
   - name: PAPERLESS_DBPASS
-    value: "paperless-db-pass"
+    value: "paperless"
 
   # --- Настройки Redis (ОБЯЗАТЕЛЬНО для работы) ---
   - name: PAPERLESS_REDIS
@@ -54,7 +54,7 @@ postgresql:
   auth:
     database: "paperless"
     username: "paperless"
-    password: "paperless-db-pass"
+    password: "paperless"
 
 redis:
   enabled: true
