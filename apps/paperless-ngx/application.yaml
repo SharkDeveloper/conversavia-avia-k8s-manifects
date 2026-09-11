@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: paperless-ngx
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    # Источник 1: Helm-чарт (CrystalNET, с PostgreSQL и Redis)
+    - repoURL: oci://harbor.crystalnet.org/charts
+      chart: paperless-ngx
+      targetRevision: "0.2.23" # Версия чарта
+      helm:
+        valueFiles:
+          - $values/apps/paperless-ngx/values.yaml
+    # Источник 2: Ваш Git-репозиторий (отсюда берётся values.yaml)
+    - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: paperless-ngx # Отдельный namespace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

@@ -1,0 +1,53 @@
+# apps/paperless-ngx/values.yaml
+
+# --- Основная конфигурация ---
+config:
+  # IP и порт, по которому вы будете заходить (используем NodePort)
+  paperless_url: "http://192.168.5.87:30800"
+  # Ссылка на Secret, который нужно создать ВРУЧНУЮ (см. ниже)
+  auth:
+    existing_secret: "paperless-ngx-secret"
+  # Языки OCR
+  ocr_languages: ["eng", "rus"]
+  # Часовой пояс
+  time_zone: "Europe/Moscow"
+
+# --- Доступ по IP (NodePort) ---
+service:
+  type: NodePort
+  # Порт на нодах кластера, по которому будет доступен Paperless
+  # Убедитесь, что он свободен (по умолчанию NodePort: 30000-32767)
+  nodePort: 30800
+
+# --- Встроенный FTP (опционально, для сканера) ---
+config.ftpd:
+  enabled: true
+  # Должен совпадать с IP, по которому вы заходите
+  public_ip: "192.168.5.87"
+  service_type: "NodePort"
+
+# --- Хранилище (использует default StorageClass) ---
+persistence:
+  data:
+    enabled: true
+    volumeClaimSpec:
+      resources:
+        requests:
+          storage: "5Gi"
+  media:
+    enabled: true
+    volumeClaimSpec:
+      resources:
+        requests:
+          storage: "20Gi"
+
+# --- База данных (PostgreSQL) и Redis ---
+# Чарт развернёт их автоматически внутри namespace
+postgresql:
+  enabled: true
+  auth:
+    database: "paperless"
+    username: "paperless"
+    password: "paperless" # Лучше вынести в Secret
+valkey:
+  enabled: true
