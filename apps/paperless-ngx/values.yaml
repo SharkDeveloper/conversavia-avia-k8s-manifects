@@ -9,13 +9,13 @@ env:
   - name: PAPERLESS_OCR_LANGUAGE
     value: "eng+rus"
 
-  # --- Redis (создаём вручную через extraObjects) ---
+  # --- Redis (создаём вручную) ---
   - name: PAPERLESS_REDIS
     value: "redis://paperless-redis:6379"
 
-  # --- PostgreSQL (зависимость чарта, создаётся автоматически) ---
+  # --- PostgreSQL (создаём вручную) ---
   - name: PAPERLESS_DBHOST
-    value: "paperless-ngx-postgresql"
+    value: "paperless-postgresql"
   - name: PAPERLESS_DBPORT
     value: "5432"
   - name: PAPERLESS_DBNAME
@@ -33,17 +33,13 @@ env:
   - name: PAPERLESS_ADMIN_MAIL
     value: "admin@example.com"
 
-  # --- Секретный ключ Django (сгенерирован) ---
+  # --- Секретный ключ ---
   - name: PAPERLESS_SECRET_KEY
     value: "xK9mP2vL8nQ4wR7tY1uI5oA3sD6fG0hJ2kM9bV4cX8zN1pL7qW3eR5tY2uI6oA"
 
-# --- Включаем PostgreSQL (создаётся чартом автоматически) ---
+# --- Отключаем встроенный PostgreSQL (его нет в чарте) ---
 postgresql:
-  enabled: true
-  auth:
-    database: "paperless"
-    username: "paperless"
-    password: "paperless"
+  enabled: false
 
 # --- Настройки доступа ---
 service:
@@ -65,8 +61,9 @@ persistence:
         requests:
           storage: "20Gi"
 
-# --- Redis: Deployment + Service через extraObjects ---
+# --- Redis + PostgreSQL через extraObjects ---
 extraObjects:
+  # ---------- REDIS ----------
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -98,3 +95,61 @@ extraObjects:
       ports:
         - port: 6379
           targetPort: 6379
+
+  # ---------- POSTGRESQL ----------
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: paperless-postgresql-data
+      namespace: paperless-ngx
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: paperless-postgresql
+      namespace: paperless-ngx
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: paperless-postgresql
+      template:
+        metadata:
+          labels:
+            app: paperless-postgresql
+        spec:
+          containers:
+            - name: postgres
+              image: postgres:16-alpine
+              ports:
+                - containerPort: 5432
+              env:
+                - name: POSTGRES_DB
+                  value: "paperless"
+                - name: POSTGRES_USER
+                  value: "paperless"
+                - name: POSTGRES_PASSWORD
+                  value: "paperless"
+              volumeMounts:
+                - name: data
+                  mountPath: /var/lib/postgresql/data
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: paperless-postgresql-data
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: paperless-postgresql
+      namespace: paperless-ngx
+    spec:
+      selector:
+        app: paperless-postgresql
+      ports:
+        - port: 5432
+          targetPort: 5432
