@@ -10,7 +10,7 @@ spec:
           - name: paperless-ngx
   template:
     metadata:
-      name: "{{ .name }}"
+      name: "rp.store-paperless-ngx"
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:
