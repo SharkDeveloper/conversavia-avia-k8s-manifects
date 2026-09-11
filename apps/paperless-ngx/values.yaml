@@ -104,7 +104,7 @@ extraObjects:
         spec:
           containers:
             - name: tika
-              image: apache/tika:latest
+              image: apache/tika:3.3.1.0
               ports:
                 - containerPort: 9998
   - apiVersion: v1
