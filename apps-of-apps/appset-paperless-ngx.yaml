@@ -82,6 +82,7 @@ extraObjects:
       name: paperless-redis
       namespace: paperless-ngx
     spec:
+<<<<<<< HEAD
       replicas: 1
       selector:
         matchLabels:
@@ -165,3 +166,32 @@ extraObjects:
       ports:
         - port: 5432
           targetPort: 5432
+=======
+      project: default
+      sources:                                    # ← МНОЖЕСТВЕННОЕ число
+        - repoURL: https://pascaliske.github.io/helm-charts
+          chart: paperless
+          targetRevision: "7.0.0"
+          helm:
+            valueFiles:
+              - $values/apps/paperless-ngx/values.yaml
+        - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
+          targetRevision: HEAD
+          ref: values                             # ← псевдоним для $values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: paperless-ngx
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
+>>>>>>> e93dcfe (Update appset-paperless-ngx.yaml)
