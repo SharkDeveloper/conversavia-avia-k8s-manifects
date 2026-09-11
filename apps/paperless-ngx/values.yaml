@@ -6,8 +6,12 @@ env:
     value: "http://192.168.5.87:30800"
   - name: PAPERLESS_TIME_ZONE
     value: "Europe/Moscow"
+  # Используем оба языка для OCR
   - name: PAPERLESS_OCR_LANGUAGE
     value: "eng+rus"
+  # Доустанавливаем русский языковой пакет при старте
+  - name: PAPERLESS_OCR_LANGUAGES
+    value: "rus"
 
   # --- Redis (создаём вручную) ---
   - name: PAPERLESS_REDIS
@@ -37,13 +41,21 @@ env:
   - name: PAPERLESS_SECRET_KEY
     value: "xK9mP2vL8nQ4wR7tY1uI5oA3sD6fG0hJ2kM9bV4cX8zN1pL7qW3eR5tY2uI6oA"
 
-# --- Отключаем встроенный PostgreSQL (его нет в чарте) ---
+# --- Права доступа (исправляет Permission issue) ---
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+# --- Отключаем встроенный PostgreSQL ---
 postgresql:
   enabled: false
 
 # --- Настройки доступа ---
 service:
   type: NodePort
+  # Чарт игнорирует nodePort, поэтому Kubernetes выдаст случайный.
+  # Актуальный порт смотрите через: kubectl get svc -n paperless-ngx
   nodePort: 30800
 
 # --- Хранилище ---
