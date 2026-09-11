@@ -1,30 +1,25 @@
 # apps/paperless-ngx/values.yaml
 
-# --- Образ с предустановленными языками OCR ---
+# --- Ваш собственный образ с русским языком ---
 image:
-  repository: fthffs/paperless
+  repository: your-registry/paperless-ngx-rus
   tag: "latest"
+  pullPolicy: Always
 
-# apps/paperless-ngx/values.yaml
-
-# --- Переменные окружения Paperless ---
+# --- Переменные окружения ---
 env:
   - name: PAPERLESS_URL
-    value: "http://192.168.5.87:30800"
+    value: "http://192.168.5.87:111"
   - name: PAPERLESS_TIME_ZONE
     value: "Europe/Moscow"
-  # Используем оба языка для OCR
   - name: PAPERLESS_OCR_LANGUAGE
     value: "eng+rus"
-  # Доустанавливаем русский языковой пакет при старте
-  - name: PAPERLESS_OCR_LANGUAGES
-    value: "rus"
 
-  # --- Redis (создаём вручную) ---
+  # --- Redis (создаём вручную через extraObjects) ---
   - name: PAPERLESS_REDIS
     value: "redis://paperless-redis:6379"
 
-  # --- PostgreSQL (создаём вручную) ---
+  # --- PostgreSQL (создаём вручную через extraObjects) ---
   - name: PAPERLESS_DBHOST
     value: "paperless-postgresql"
   - name: PAPERLESS_DBPORT
@@ -54,16 +49,17 @@ podSecurityContext:
   runAsGroup: 1000
   fsGroup: 1000
 
-# --- Отключаем встроенный PostgreSQL ---
+# --- Отключаем встроенные зависимости (создаём вручную) ---
 postgresql:
+  enabled: false
+redis:
   enabled: false
 
 # --- Настройки доступа ---
 service:
   type: NodePort
-  # Чарт игнорирует nodePort, поэтому Kubernetes выдаст случайный.
-  # Актуальный порт смотрите через: kubectl get svc -n paperless-ngx
-  nodePort: 30800
+  port: 8000
+  nodePort: 30011   # Ближайший допустимый порт (диапазон 30000–32767)
 
 # --- Хранилище ---
 persistence:
