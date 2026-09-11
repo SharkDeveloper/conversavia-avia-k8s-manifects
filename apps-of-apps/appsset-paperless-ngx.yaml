@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: rp.store-paperless-ngx
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: paperless-ngx
+  template:
+    metadata:
+      name: "{{ .name }}"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
+        targetRevision: HEAD
+        path: apps/paperless-ngx
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: paperless-ngx
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
