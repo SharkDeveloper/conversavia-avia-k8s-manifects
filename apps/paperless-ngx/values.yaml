@@ -1,17 +1,20 @@
 # apps/paperless-ngx/values.yaml
 
+# --- Образ с предустановленными языками OCR ---
+image:
+  repository: fthffs/paperless
+  tag: "latest"   # Рекомендую заменить на конкретный тег, например "3.1.2", для воспроизводимости
+
 # --- Переменные окружения Paperless ---
 env:
   - name: PAPERLESS_URL
     value: "http://192.168.5.87:30800"
   - name: PAPERLESS_TIME_ZONE
     value: "Europe/Moscow"
-  # Используем оба языка для OCR
+  # Указываем оба языка для OCR
   - name: PAPERLESS_OCR_LANGUAGE
     value: "eng+rus"
-  # Доустанавливаем русский языковой пакет при старте
-  - name: PAPERLESS_OCR_LANGUAGES
-    value: "rus"
+  # Переменная PAPERLESS_OCR_LANGUAGES удалена, так как пакеты уже в образе
 
   # --- Redis (создаём вручную) ---
   - name: PAPERLESS_REDIS
@@ -54,9 +57,8 @@ postgresql:
 # --- Настройки доступа ---
 service:
   type: NodePort
-  # Чарт игнорирует nodePort, поэтому Kubernetes выдаст случайный.
-  # Актуальный порт смотрите через: kubectl get svc -n paperless-ngx
-  nodePort: 30800
+  # Порт будет назначен автоматически, актуальный смотрите командой
+  # kubectl get svc -n paperless-ngx
 
 # --- Хранилище ---
 persistence:
