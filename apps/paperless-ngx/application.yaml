@@ -9,9 +9,9 @@ spec:
   project: default
   sources:
     # Источник 1: Helm-чарт
-    - repoURL: https://alexmorbo.github.io/alexmorbo-paperless-ngx
-      chart: paperless-ngx
-      targetRevision: "0.1.1"
+    - repoURL: https://pascaliske.github.io/helm-charts
+      chart: paperless
+      targetRevision: "7.0.0"
       helm:
         valueFiles:
           - $values/apps/paperless-ngx/values.yaml
