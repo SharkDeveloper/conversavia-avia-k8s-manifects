@@ -8,20 +8,25 @@ metadata:
 spec:
   project: default
   sources:
-    # Источник 1: Helm-чарт (CrystalNET, с PostgreSQL и Redis)
+    # Источник 1: Helm-чарт
     - repoURL: oci://harbor.crystalnet.org/charts
       chart: paperless-ngx
-      targetRevision: "0.2.23" # Версия чарта
+      targetRevision: "0.2.23"
       helm:
         valueFiles:
           - $values/apps/paperless-ngx/values.yaml
-    # Источник 2: Ваш Git-репозиторий (отсюда берётся values.yaml)
+
+    # Источник 2: Ваш Git-репозиторий (values.yaml + secret.yaml)
     - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
       targetRevision: HEAD
       ref: values
+      # Указываем, что из этого источника нужно применить ещё и "сырые" манифесты
+      directory:
+        include: "secret.yaml"
+        recurse: false
   destination:
     server: https://kubernetes.default.svc
-    namespace: paperless-ngx # Отдельный namespace
+    namespace: paperless-ngx
   syncPolicy:
     automated:
       prune: true
