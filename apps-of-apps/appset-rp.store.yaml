@@ -20,7 +20,7 @@ spec:
             path: apps/redis
   template:
     metadata:
-      name: "rp.store"
+      name: "rp.store-pg-rd"
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:
