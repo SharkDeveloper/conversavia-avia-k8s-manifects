@@ -1,169 +1,24 @@
-# apps/paperless-ngx/values.yaml
-
-# --- Образ с предустановленными языками OCR ---
 image:
-  repository: fthffs/paperless
-  tag: "latest"   # Рекомендую заменить на конкретный тег, например "3.1.2", для воспроизводимости
+  repository: ghcr.io/paperless-ngx/paperless-ngx
+  tag: "latest" # или конкретная версия
 
-# --- Переменные окружения Paperless ---
 env:
-  - name: PAPERLESS_URL
-    value: "http://192.168.5.87:30800"
-  - name: PAPERLESS_TIME_ZONE
-    value: "Europe/Moscow"
-  # Указываем оба языка для OCR
   - name: PAPERLESS_OCR_LANGUAGE
     value: "eng+rus"
-  # Переменная PAPERLESS_OCR_LANGUAGES удалена, так как пакеты уже в образе
+  # PAPERLESS_OCR_LANGUAGES не нужен, если ставим через init-контейнер
 
-  # --- Redis (создаём вручную) ---
-  - name: PAPERLESS_REDIS
-    value: "redis://paperless-redis:6379"
-
-  # --- PostgreSQL (создаём вручную) ---
-  - name: PAPERLESS_DBHOST
-    value: "paperless-postgresql"
-  - name: PAPERLESS_DBPORT
-    value: "5432"
-  - name: PAPERLESS_DBNAME
-    value: "paperless"
-  - name: PAPERLESS_DBUSER
-    value: "paperless"
-  - name: PAPERLESS_DBPASS
-    value: "paperless"
-
-  # --- Администратор ---
-  - name: PAPERLESS_ADMIN_USER
-    value: "admin"
-  - name: PAPERLESS_ADMIN_PASSWORD
-    value: "admin"
-  - name: PAPERLESS_ADMIN_MAIL
-    value: "admin@example.com"
-
-  # --- Секретный ключ ---
-  - name: PAPERLESS_SECRET_KEY
-    value: "xK9mP2vL8nQ4wR7tY1uI5oA3sD6fG0hJ2kM9bV4cX8zN1pL7qW3eR5tY2uI6oA"
-
-# --- Права доступа (исправляет Permission issue) ---
-podSecurityContext:
-  runAsUser: 1000
-  runAsGroup: 1000
-  fsGroup: 1000
-
-# --- Отключаем встроенный PostgreSQL ---
-postgresql:
-  enabled: false
-
-# --- Настройки доступа ---
-service:
-  type: NodePort
-  # Порт будет назначен автоматически, актуальный смотрите командой
-  # kubectl get svc -n paperless-ngx
-
-# --- Хранилище ---
-persistence:
-  data:
-    enabled: true
-    volumeClaimSpec:
-      resources:
-        requests:
-          storage: "5Gi"
-  media:
-    enabled: true
-    volumeClaimSpec:
-      resources:
-        requests:
-          storage: "20Gi"
-
-# --- Redis + PostgreSQL через extraObjects ---
-extraObjects:
-  # ---------- REDIS ----------
-  - apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      name: paperless-redis
-      namespace: paperless-ngx
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          app: paperless-redis
-      template:
-        metadata:
-          labels:
-            app: paperless-redis
-        spec:
-          containers:
-            - name: redis
-              image: redis:7-alpine
-              ports:
-                - containerPort: 6379
-  - apiVersion: v1
-    kind: Service
-    metadata:
-      name: paperless-redis
-      namespace: paperless-ngx
-    spec:
-      selector:
-        app: paperless-redis
-      ports:
-        - port: 6379
-          targetPort: 6379
-
-  # ---------- POSTGRESQL ----------
-  - apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      name: paperless-postgresql-data
-      namespace: paperless-ngx
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 5Gi
-  - apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      name: paperless-postgresql
-      namespace: paperless-ngx
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          app: paperless-postgresql
-      template:
-        metadata:
-          labels:
-            app: paperless-postgresql
-        spec:
-          containers:
-            - name: postgres
-              image: postgres:16-alpine
-              ports:
-                - containerPort: 5432
-              env:
-                - name: POSTGRES_DB
-                  value: "paperless"
-                - name: POSTGRES_USER
-                  value: "paperless"
-                - name: POSTGRES_PASSWORD
-                  value: "paperless"
-              volumeMounts:
-                - name: data
-                  mountPath: /var/lib/postgresql/data
-          volumes:
-            - name: data
-              persistentVolumeClaim:
-                claimName: paperless-postgresql-data
-  - apiVersion: v1
-    kind: Service
-    metadata:
-      name: paperless-postgresql
-      namespace: paperless-ngx
-    spec:
-      selector:
-        app: paperless-postgresql
-      ports:
-        - port: 5432
-          targetPort: 5432
+extraInitContainers:
+  - name: install-russian-ocr
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    command:
+      - sh
+      - -c
+      - |
+        apt-get update && apt-get install -y tesseract-ocr-rus
+        # Копируем traineddata в директорию, откуда Paperless его читает
+        cp /usr/share/tesseract-ocr/*/tessdata/rus.traineddata /tmp/ 2>/dev/null || true
+    securityContext:
+      runAsUser: 0
+    volumeMounts:
+      - name: tessdata
+        mountPath: /tmp
