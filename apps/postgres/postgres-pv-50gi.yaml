@@ -13,7 +13,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: /var/lib/postgres-data-25gi
+    path: /var/lib/postgres-data-50gi
   nodeAffinity:
     required:
       nodeSelectorTerms:
