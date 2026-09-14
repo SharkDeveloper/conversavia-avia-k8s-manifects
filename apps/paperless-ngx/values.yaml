@@ -43,6 +43,14 @@ env:
   - name: PAPERLESS_SECRET_KEY
     value: "xK9mP2vL8nQ4wR7tY1uI5oA3sD6fG0hJ2kM9bV4cX8zN1pL7qW3eR5tY2uI6oA"
 
+  # --- Tika и Gotenberg для поддержки Office-документов ---
+  - name: PAPERLESS_TIKA_ENABLED
+    value: "true"
+  - name: PAPERLESS_TIKA_ENDPOINT
+    value: "http://paperless-tika:9998"
+  - name: PAPERLESS_TIKA_GOTENBERG_ENDPOINT
+    value: "http://paperless-gotenberg:3000"
+
 # --- Права доступа (исправляет Permission issue) ---
 podSecurityContext:
   runAsUser: 1000
