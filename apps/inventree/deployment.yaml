@@ -57,7 +57,7 @@ spec:
             - name: INVENTREE_DB_USER
               value: inventree
             - name: INVENTREE_DB_PASSWORD
-              value: inventree
+              value: postgres
           volumeMounts:
             - name: inventree-data
               mountPath: /home/inventree/data
@@ -105,7 +105,7 @@ spec:
             - name: INVENTREE_DB_USER
               value: inventree
             - name: INVENTREE_DB_PASSWORD
-              value: inventree
+              value: postgres
           envFrom:
             - secretRef:
                 name: inventree-admin-secret

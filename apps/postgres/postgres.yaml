@@ -6,7 +6,7 @@ metadata:
 type: Opaque
 stringData:
   POSTGRES_USER: inventree
-  POSTGRES_PASSWORD: inventree
+  POSTGRES_PASSWORD: postgres
   POSTGRES_DB: inventree
 ---
 apiVersion: v1
@@ -20,7 +20,7 @@ spec:
   storageClassName: local-path
   resources:
     requests:
-      storage: 25Gi
+      storage: 50Gi
 ---
 apiVersion: apps/v1
 kind: Deployment

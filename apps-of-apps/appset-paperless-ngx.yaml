@@ -1,30 +1,36 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: rp.store-inventree
+  name: rp.store-paperless-ngx
   namespace: argocd
 spec:
-  # ApplicationSet для компонента InvenTree.
-  # Использует чистые Kubernetes-манифесты (Kustomize) из папки apps/inventree
-  # в этом же Git-репозитории (без Helm-чарта — вендоринг был заменён на plain YAML).
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
   generators:
     - list:
         elements:
-          - name: inventree
+          - name: paperless-ngx
   template:
     metadata:
-      name: "inventree"
+      name: "{{ .name }}"
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:
       project: default
-      source:
-        repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
-        targetRevision: HEAD
-        path: apps/inventree
+      sources:
+        - repoURL: https://pascaliske.github.io/helm-charts
+          chart: paperless
+          targetRevision: "7.0.0"
+          helm:
+            valueFiles:
+              - $values/apps/paperless-ngx/values.yaml
+        - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
+          targetRevision: HEAD
+          ref: values
       destination:
         server: https://kubernetes.default.svc
-        namespace: inventree
+        namespace: paperless-ngx
       syncPolicy:
         automated:
           prune: true
