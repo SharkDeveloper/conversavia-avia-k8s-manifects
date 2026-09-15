@@ -195,7 +195,7 @@ extraObjects:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 5Gi
+          storage: 150Gi
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
