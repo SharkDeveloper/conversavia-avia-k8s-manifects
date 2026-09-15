@@ -74,12 +74,18 @@ persistence:
   data:
     enabled: true
     volumeClaimSpec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
       resources:
         requests:
           storage: "5Gi"
   media:
     enabled: true
     volumeClaimSpec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
       resources:
         requests:
           storage: "20Gi"
@@ -193,6 +199,7 @@ extraObjects:
     spec:
       accessModes:
         - ReadWriteOnce
+      storageClassName: local-path
       resources:
         requests:
           storage: 150Gi
