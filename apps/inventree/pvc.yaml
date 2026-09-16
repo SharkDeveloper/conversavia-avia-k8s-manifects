@@ -5,10 +5,12 @@ metadata:
   namespace: inventree
   labels:
     app: inventree
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: local-path
   resources:
     requests:
-      storage: 50Gi
+      storage: 32Gi
