@@ -251,7 +251,7 @@ extraObjects:
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
-      name: paperless-ngx-media
+      name: paperless-ngx-consumption
       namespace: paperless-ngx
       labels:
         app: paperless-ngx
