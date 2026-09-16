@@ -1,12 +1,10 @@
 # apps/paperless-ngx/values.yaml
 
-# --- Ваш собственный образ с русским языком ---
 image:
   repository: ghcr.io/sharkdeveloper/conversavia-avia-k8s-manifects/paperless-ngx-rus
   tag: "latest"
   pullPolicy: Always
 
-# --- Переменные окружения ---
 env:
   - name: PAPERLESS_URL
     value: "http://192.168.5.87:31791"
@@ -46,42 +44,62 @@ env:
   - name: PAPERLESS_TIKA_GOTENBERG_ENDPOINT
     value: "http://paperless-gotenberg:3000"
 
+# --- Ресурсы основного контейнера paperless-ngx ---
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "2Gi"
+    cpu: "1500m"
+
 # --- Права доступа ---
 podSecurityContext:
   runAsUser: 1000
   runAsGroup: 1000
   fsGroup: 1000
 
-# --- Отключаем встроенные зависимости ---
+# --- Отключаем встроенные зависимости чарта ---
 postgresql:
   enabled: false
 redis:
   enabled: false
 
-# --- Настройки доступа ---
+# --- Доступ: NodePort зафиксирован явно ---
 service:
   type: NodePort
-  port: 8000
 
-# --- ✅ ИСПРАВЛЕННЫЙ БЛОК ХРАНИЛИЩА ---
-persistence:
-  data:
-    enabled: true
-    size: 50Gi
-    storageClassName: local-path
-    accessModes:
-      - ReadWriteOnce
-  media:
-    enabled: true
-    existingClaim: paperless-ngx-media
-  consume:
-    enabled: true
-    size: 5Gi
-    storageClassName: local-path
-    accessModes:
-      - ReadWriteOnce
+ports:
+  http:
+    port: 8000
+    nodePort: 31791   # фиксированный порт, чтобы не менялся при пересоздании Service
 
-# --- Redis + PostgreSQL через extraObjects ---
+# --- Основная директория данных приложения (/usr/src/paperless) ---
+persistentVolumeClaim:
+  create: true
+  size: "5Gi"
+  storageClassName: "local-path"
+  accessMode: "ReadWriteOnce"
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+
+# --- Медиа (сами документы) — вынесены на отдельный PVC, см. extraObjects ---
+media:
+  enabled: true
+  type: pvc
+  persistentVolumeClaim:
+    existingPersistentVolumeClaim: paperless-ngx-media
+
+# --- Папка входящих документов на обработку ---
+consumption:
+  enabled: true
+  type: pvc
+  persistentVolumeClaim:
+    size: "5Gi"
+    storageClassName: "local-path"
+    accessMode: "ReadWriteOnce"
+
+# --- Redis + PostgreSQL + Tika + Gotenberg через extraObjects ---
 extraObjects:
   # ---------- APACHE TIKA ----------
   - apiVersion: apps/v1
@@ -104,6 +122,13 @@ extraObjects:
               image: apache/tika:3.3.1.0
               ports:
                 - containerPort: 9998
+              resources:
+                requests:
+                  memory: "384Mi"
+                  cpu: "200m"
+                limits:
+                  memory: "1Gi"
+                  cpu: "1000m"
   - apiVersion: v1
     kind: Service
     metadata:
@@ -137,6 +162,13 @@ extraObjects:
               image: gotenberg/gotenberg:latest
               ports:
                 - containerPort: 3000
+              resources:
+                requests:
+                  memory: "256Mi"
+                  cpu: "200m"
+                limits:
+                  memory: "768Mi"
+                  cpu: "1000m"
   - apiVersion: v1
     kind: Service
     metadata:
@@ -170,6 +202,13 @@ extraObjects:
               image: redis:7-alpine
               ports:
                 - containerPort: 6379
+              resources:
+                requests:
+                  memory: "32Mi"
+                  cpu: "50m"
+                limits:
+                  memory: "128Mi"
+                  cpu: "200m"
   - apiVersion: v1
     kind: Service
     metadata:
@@ -190,13 +229,15 @@ extraObjects:
       namespace: paperless-ngx
       labels:
         app: paperless-postgresql
+      annotations:
+        argocd.argoproj.io/sync-options: Prune=false
     spec:
       accessModes:
         - ReadWriteOnce
       storageClassName: local-path
       resources:
         requests:
-          storage: 150Gi
+          storage: 30Gi
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
@@ -204,13 +245,15 @@ extraObjects:
       namespace: paperless-ngx
       labels:
         app: paperless-ngx
+      annotations:
+        argocd.argoproj.io/sync-options: Prune=false
     spec:
       accessModes:
         - ReadWriteOnce
       storageClassName: local-path
       resources:
         requests:
-          storage: 100Gi
+          storage: 110Gi
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -238,6 +281,13 @@ extraObjects:
                   value: "paperless"
                 - name: POSTGRES_PASSWORD
                   value: "paperless"
+              resources:
+                requests:
+                  memory: "256Mi"
+                  cpu: "200m"
+                limits:
+                  memory: "768Mi"
+                  cpu: "500m"
               volumeMounts:
                 - name: data
                   mountPath: /var/lib/postgresql/data
