@@ -8,6 +8,8 @@ metadata:
     app.kubernetes.io/name: inventree-worker
 spec:
   replicas: 1
+  securityContext:
+        fsGroup: 999 
   revisionHistoryLimit: 10
   strategy:
     type: RollingUpdate
