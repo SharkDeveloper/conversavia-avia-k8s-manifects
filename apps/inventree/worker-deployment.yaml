@@ -67,7 +67,7 @@ spec:
               value: postgres
           resources:
             requests:
-              memory: "256Mi"
+              memory: "762Mi"
               cpu: "150m"
             limits:
               memory: "1524Mi"
