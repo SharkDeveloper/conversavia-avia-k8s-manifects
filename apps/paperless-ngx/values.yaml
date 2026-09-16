@@ -34,9 +34,6 @@ env:
   - name: PAPERLESS_ADMIN_MAIL
     value: "admin@example.com"
 
-  - name: PAPERLESS_SECRET_KEY
-    value: "xK9mP2vL8nQ4wR7tY1uI5oA3sD6fG0hJ2kM9bV4cX8zN1pL7qW3eR5tY2uI6oA"
-
   - name: PAPERLESS_TIKA_ENABLED
     value: "true"
   - name: PAPERLESS_TIKA_ENDPOINT
