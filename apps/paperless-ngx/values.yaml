@@ -87,14 +87,11 @@ media:
   persistentVolumeClaim:
     claimName: paperless-ngx-media  # ← ДОЛЖНО БЫТЬ claimName, а не existingPersistentVolumeClaim
 
-# --- Папка входящих документов на обработку ---
 consumption:
   enabled: true
   type: pvc
   persistentVolumeClaim:
-    size: "5Gi"
-    storageClassName: "local-path"
-    accessMode: "ReadWriteOnce"
+    claimName: paperless-ngx-consumption
     
 # --- Redis + PostgreSQL + Tika + Gotenberg через extraObjects ---
 extraObjects:
