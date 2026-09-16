@@ -78,7 +78,7 @@ persistentVolumeClaim:
   storageClassName: "local-path"
   accessMode: "ReadWriteOnce"
   annotations:
-    argocd.argoproj.io/sync-options: Prune=false
+    argocd.argoproj.io/sync-options: Prune=true
 media:
   enabled: true
   type: pvc
