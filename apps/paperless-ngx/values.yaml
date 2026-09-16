@@ -80,12 +80,12 @@ persistentVolumeClaim:
   annotations:
     argocd.argoproj.io/sync-options: Prune=false
     
-# --- Медиа (сами документы) — вынесены на отдельный PVC, см. extraObjects ---
+# --- Медиа (сами документы) — вынесены на отдельный PVC ---
 media:
   enabled: true
   type: pvc
   persistentVolumeClaim:
-    existingPersistentVolumeClaim: paperless-ngx-media
+    claimName: paperless-ngx-media  # ← ДОЛЖНО БЫТЬ claimName, а не existingPersistentVolumeClaim
 
 # --- Папка входящих документов на обработку ---
 consumption:
