@@ -79,22 +79,15 @@ persistentVolumeClaim:
   accessMode: "ReadWriteOnce"
   annotations:
     argocd.argoproj.io/sync-options: Prune=false
-
-# --- Медиа (сами документы) — вынесены на отдельный PVC, см. extraObjects ---
 media:
   enabled: true
   type: pvc
-  persistentVolumeClaim:
-    existingPersistentVolumeClaim: paperless-ngx-media
+  existingPersistentVolumeClaim: paperless-ngx-media   # ← ключ на уровень выше
 
-# --- Папка входящих документов на обработку ---
 consumption:
   enabled: true
   type: pvc
-  persistentVolumeClaim:
-    size: "5Gi"
-    storageClassName: "local-path"
-    accessMode: "ReadWriteOnce"
+  existingPersistentVolumeClaim: paperless-ngx-consumption
 
 # --- Redis + PostgreSQL + Tika + Gotenberg через extraObjects ---
 extraObjects:
