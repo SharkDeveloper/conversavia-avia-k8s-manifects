@@ -70,25 +70,44 @@ service:
   nodePort: 30011   # Ближайший допустимый порт (диапазон 30000–32767)
 
 # --- Хранилище ---
-persistence:
-  data:
-    enabled: true
-    volumeClaimSpec:
-      accessModes:
-        - ReadWriteOnce
-      storageClassName: local-path
-      resources:
-        requests:
-          storage: "5Gi"
-  media:
-    enabled: true
-    volumeClaimSpec:
-      accessModes:
-        - ReadWriteOnce
-      storageClassName: local-path
-      resources:
-        requests:
-          storage: "20Gi"
+# Используем отдельные PVC для data и media с явным указанием storageClassName
+persistentVolumeClaim:
+  create: true
+  mountPath: /usr/src/paperless/data
+  accessMode: ReadWriteOnce
+  volumeMode: Filesystem
+  size: 50Gi
+  storageClassName: local-path
+  existingPersistentVolumeClaim: ""
+  annotations: {}
+  labels:
+    app: paperless-ngx
+
+media:
+  enabled: true
+  type: pvc
+  mountPath: /media
+  persistentVolumeClaim:
+    claimName: paperless-ngx-media
+  emptyDir: {}
+
+consumption:
+  enabled: true
+  type: emptyDir
+  mountPath: /consumption
+  emptyDir: {}
+
+export:
+  enabled: false
+  type: emptyDir
+  mountPath: /export
+  emptyDir: {}
+
+trash:
+  enabled: false
+  type: emptyDir
+  mountPath: /trash
+  emptyDir: {}
 
 # --- Redis + PostgreSQL через extraObjects ---
 extraObjects:
@@ -196,13 +215,30 @@ extraObjects:
     metadata:
       name: paperless-postgresql-data
       namespace: paperless-ngx
+      labels:
+        app: paperless-postgresql
     spec:
       accessModes:
         - ReadWriteOnce
       storageClassName: local-path
       resources:
         requests:
-          storage: 150Gi
+          storage: 50Gi
+  # ---------- PVC для media (отдельный от основного) ----------
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: paperless-ngx-media
+      namespace: paperless-ngx
+      labels:
+        app: paperless-ngx
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 100Gi
   - apiVersion: apps/v1
     kind: Deployment
     metadata:

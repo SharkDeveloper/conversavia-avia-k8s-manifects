@@ -1,76 +1,51 @@
-```yaml
-# Build artifacts and distributions
-dist/
-build/
-target/
-release/
-out/
+```
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
 
 # Dependencies
 node_modules/
-vendor/
-deps/
-.cargo/
-Cargo.lock
-
-# Python specific
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
 venv/
 .venv/
-.venv-*/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.gradle/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+dist/
 build/
-.settings/
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
+target/
+.gradle/
 
-# Configuration and environment files
-.env
-.env.local
-.env.*
-!env.example
-!example.env
+# Compiled files
+*.pyc
+*.class
+*.o
+*.exe
+*.dll
+*.so
+*.a
+*.obj
+*.out
 
-# OS generated files
+# System files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
-desktop.ini
 
-# Testing
-*.test
-*.tests
-test/
-tests/
-spec/
+# Coverage
+coverage/
+htmlcov/
+.coverage
 
-# Documentation
-docs/_build/
-docs/build/
-
-# Compression
+# Compressed files
 *.zip
 *.gz
 *.tar

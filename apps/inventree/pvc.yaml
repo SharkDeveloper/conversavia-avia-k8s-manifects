@@ -3,10 +3,12 @@ kind: PersistentVolumeClaim
 metadata:
   name: inventree-data
   namespace: inventree
+  labels:
+    app: inventree
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: local-path
   resources:
     requests:
       storage: 50Gi
-  storageClassName: local-path
