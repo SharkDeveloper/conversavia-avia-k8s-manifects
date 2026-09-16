@@ -248,6 +248,22 @@ extraObjects:
       resources:
         requests:
           storage: 110Gi
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: paperless-ngx-media
+      namespace: paperless-ngx
+      labels:
+        app: paperless-ngx
+      annotations:
+        argocd.argoproj.io/sync-options: Prune=false
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
