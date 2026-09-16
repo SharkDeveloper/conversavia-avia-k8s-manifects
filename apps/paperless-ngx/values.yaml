@@ -54,7 +54,7 @@ resources:
 podSecurityContext:
   runAsUser: 1000
   runAsGroup: 1000
-  fsGroup: 1000
+  fsGroup: 999
 
 # --- Отключаем встроенные зависимости чарта ---
 postgresql:
