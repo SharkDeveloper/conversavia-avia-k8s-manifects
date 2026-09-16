@@ -196,7 +196,7 @@ extraObjects:
       storageClassName: local-path
       resources:
         requests:
-          storage: 50Gi
+          storage: 150Gi
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
