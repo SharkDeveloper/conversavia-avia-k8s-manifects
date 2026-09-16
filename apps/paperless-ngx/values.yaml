@@ -9,17 +9,15 @@ image:
 # --- Переменные окружения ---
 env:
   - name: PAPERLESS_URL
-    value: "http://192.168.5.87:111"
+    value: "http://192.168.5.87:31791"
   - name: PAPERLESS_TIME_ZONE
     value: "Europe/Moscow"
   - name: PAPERLESS_OCR_LANGUAGE
     value: "eng+rus"
-    
-  # --- Redis (создаём вручную через extraObjects) ---
+
   - name: PAPERLESS_REDIS
     value: "redis://paperless-redis:6379"
 
-  # --- PostgreSQL (создаём вручную через extraObjects) ---
   - name: PAPERLESS_DBHOST
     value: "paperless-postgresql"
   - name: PAPERLESS_DBPORT
@@ -31,7 +29,6 @@ env:
   - name: PAPERLESS_DBPASS
     value: "paperless"
 
-  # --- Администратор ---
   - name: PAPERLESS_ADMIN_USER
     value: "admin"
   - name: PAPERLESS_ADMIN_PASSWORD
@@ -39,11 +36,9 @@ env:
   - name: PAPERLESS_ADMIN_MAIL
     value: "admin@example.com"
 
-  # --- Секретный ключ ---
   - name: PAPERLESS_SECRET_KEY
     value: "xK9mP2vL8nQ4wR7tY1uI5oA3sD6fG0hJ2kM9bV4cX8zN1pL7qW3eR5tY2uI6oA"
 
-  # --- Tika и Gotenberg для поддержки Office-документов ---
   - name: PAPERLESS_TIKA_ENABLED
     value: "true"
   - name: PAPERLESS_TIKA_ENDPOINT
@@ -51,13 +46,13 @@ env:
   - name: PAPERLESS_TIKA_GOTENBERG_ENDPOINT
     value: "http://paperless-gotenberg:3000"
 
-# --- Права доступа (исправляет Permission issue) ---
+# --- Права доступа ---
 podSecurityContext:
   runAsUser: 1000
   runAsGroup: 1000
   fsGroup: 1000
 
-# --- Отключаем встроенные зависимости (создаём вручную) ---
+# --- Отключаем встроенные зависимости ---
 postgresql:
   enabled: false
 redis:
@@ -67,47 +62,24 @@ redis:
 service:
   type: NodePort
   port: 8000
-  nodePort: 30011   # Ближайший допустимый порт (диапазон 30000–32767)
 
-# --- Хранилище ---
-# Используем отдельные PVC для data и media с явным указанием storageClassName
-persistentVolumeClaim:
-  create: true
-  mountPath: /usr/src/paperless/data
-  accessMode: ReadWriteOnce
-  volumeMode: Filesystem
-  size: 50Gi
-  storageClassName: local-path
-  existingPersistentVolumeClaim: ""
-  annotations: {}
-  labels:
-    app: paperless-ngx
-
-media:
-  enabled: true
-  type: pvc
-  mountPath: /media
-  persistentVolumeClaim:
-    claimName: paperless-ngx-media
-  emptyDir: {}
-
-consumption:
-  enabled: true
-  type: emptyDir
-  mountPath: /consumption
-  emptyDir: {}
-
-export:
-  enabled: false
-  type: emptyDir
-  mountPath: /export
-  emptyDir: {}
-
-trash:
-  enabled: false
-  type: emptyDir
-  mountPath: /trash
-  emptyDir: {}
+# --- ✅ ИСПРАВЛЕННЫЙ БЛОК ХРАНИЛИЩА ---
+persistence:
+  data:
+    enabled: true
+    size: 50Gi
+    storageClassName: local-path
+    accessModes:
+      - ReadWriteOnce
+  media:
+    enabled: true
+    existingClaim: paperless-ngx-media
+  consume:
+    enabled: true
+    size: 5Gi
+    storageClassName: local-path
+    accessModes:
+      - ReadWriteOnce
 
 # --- Redis + PostgreSQL через extraObjects ---
 extraObjects:
@@ -176,6 +148,7 @@ extraObjects:
       ports:
         - port: 3000
           targetPort: 3000
+
   # ---------- REDIS ----------
   - apiVersion: apps/v1
     kind: Deployment
@@ -224,7 +197,6 @@ extraObjects:
       resources:
         requests:
           storage: 50Gi
-  # ---------- PVC для media (отдельный от основного) ----------
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
