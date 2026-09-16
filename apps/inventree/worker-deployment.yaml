@@ -65,6 +65,13 @@ spec:
               value: inventree
             - name: INVENTREE_DB_PASSWORD
               value: postgres
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "150m"
+            limits:
+              memory: "768Mi"
+              cpu: "500m"
           volumeMounts:
             - name: inventree-data
               mountPath: /home/inventree/data
