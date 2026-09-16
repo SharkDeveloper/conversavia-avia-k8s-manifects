@@ -14,13 +14,15 @@ kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
   namespace: inventree
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: local-storage
   resources:
     requests:
-      storage: 50Gi
+      storage: 16Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -47,6 +49,13 @@ spec:
                 name: postgres-secret
           ports:
             - containerPort: 5432
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "768Mi"
+              cpu: "500m"
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
