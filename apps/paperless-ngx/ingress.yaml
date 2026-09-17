@@ -3,13 +3,9 @@ kind: Ingress
 metadata:
   name: paperless-ngx
   namespace: paperless-ngx
-  labels:
-    app.kubernetes.io/name: paperless-ngx
-    app.kubernetes.io/instance: paperless-ngx
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    # Если понадобится HTTPS — см. блок tls ниже и поднимите ssl-redirect в "true"
 spec:
   ingressClassName: nginx
   rules:
@@ -23,8 +19,3 @@ spec:
                 name: paperless-ngx
                 port:
                   number: 8000
-  # Раскомментируйте, если нужен HTTPS с сертификатом:
-  # tls:
-  #   - hosts:
-  #       - rp.doc
-  #     secretName: rp-doc-tls
