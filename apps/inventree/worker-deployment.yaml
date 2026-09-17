@@ -70,7 +70,7 @@ spec:
               memory: "762Mi"
               cpu: "500m"
             limits:
-              memory: "2048"
+              memory: "2048Mi"
               cpu: "2000m"
           volumeMounts:
             - name: inventree-data
