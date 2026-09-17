@@ -70,8 +70,8 @@ spec:
               memory: "762Mi"
               cpu: "500m"
             limits:
-              memory: "1524Mi"
-              cpu: "1000m"
+              memory: "2048"
+              cpu: "2000m"
           volumeMounts:
             - name: inventree-data
               mountPath: /home/inventree/data
