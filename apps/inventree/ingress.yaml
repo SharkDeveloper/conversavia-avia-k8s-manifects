@@ -22,7 +22,7 @@ spec:
                 name: inventree
                 port:
                   number: 80
-  tls:
-    - hosts:
-        - rp.store
-      secretName: inventree-tls
+  # tls:
+  #   - hosts:
+  #       - rp.store
+  #     secretName: inventree-tls
