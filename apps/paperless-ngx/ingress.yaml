@@ -9,8 +9,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    # Если ingress-nginx работает в HTTP и TLS не нужен — оставляем false.
-    # Если нужен HTTPS с редиректом — поставьте "true" и добавьте tls-блок ниже.
+    # Если понадобится HTTPS — см. блок tls ниже и поднимите ssl-redirect в "true"
 spec:
   ingressClassName: nginx
   rules:
@@ -21,10 +20,10 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: paperless-ngx       
+                name: paperless-ngx
                 port:
-                  number: 8000             
-
+                  number: 8000
+  # Раскомментируйте, если нужен HTTPS с сертификатом:
   # tls:
   #   - hosts:
   #       - rp.doc
