@@ -105,6 +105,28 @@ consumption:
     
 # --- Redis + PostgreSQL + Tika + Gotenberg через extraObjects ---
 extraObjects:
+  # ---------- INGRESS ----------
+  - apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: paperless-ngx
+      namespace: paperless-ngx
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    spec:
+      ingressClassName: nginx
+      rules:
+        - host: rp.doc
+          http:
+            paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: paperless-ngx
+                    port:
+                      number: 8000
   # ---------- APACHE TIKA ----------
   - apiVersion: apps/v1
     kind: Deployment
