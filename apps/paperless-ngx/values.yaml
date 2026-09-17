@@ -7,11 +7,13 @@ image:
 
 env:
   - name: PAPERLESS_URL
-    value: "http://192.168.5.87:31791"
+    value: "http://rp.doc"
   - name: PAPERLESS_TIME_ZONE
     value: "Europe/Moscow"
   - name: PAPERLESS_OCR_LANGUAGE
     value: "eng+rus"
+  - name: PAPERLESS_CSRF_TRUSTED_ORIGINS
+    value: "http://rp.doc,https://rp.doc"
 
   - name: PAPERLESS_REDIS
     value: "redis://paperless-redis:6379"
