@@ -40,15 +40,23 @@ env:
     value: "http://paperless-tika:9998"
   - name: PAPERLESS_TIKA_GOTENBERG_ENDPOINT
     value: "http://paperless-gotenberg:3000"
+    
+    # 1. Жёстко ограничиваем ocrmypdf до 5 потоков (вместо 16)
+  - name: PAPERLESS_OCR_USER_ARGS
+    value: '{"jobs": 5, "optimize": 0}'
+  
+  # 2. Ограничиваем количество воркеров Celery до 1 или 2
+  - name: PAPERLESS_TASK_WORKERS
+    value: "3"
 
 # --- Ресурсы основного контейнера paperless-ngx ---
 resources:
   requests:
-    memory: "512Mi"
-    cpu: "250m"
+    memory: "1Gi"
+    cpu: "500m"
   limits:
-    memory: "2Gi"
-    cpu: "1500m"
+    memory: "2Gi"   # Увеличили с 1.5Gi до 2Gi для запаса при OCR
+    cpu: "2000m"
 
 # --- Права доступа ---
 podSecurityContext:
