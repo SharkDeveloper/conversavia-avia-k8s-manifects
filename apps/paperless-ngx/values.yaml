@@ -114,8 +114,17 @@ extraObjects:
       annotations:
         nginx.ingress.kubernetes.io/proxy-body-size: "50m"
         nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        # Редирект HTTPS → HTTP (после успешного TLS handshake)
+        nginx.ingress.kubernetes.io/configuration-snippet: |
+          if ($scheme = https) {
+            return 301 http://$host$request_uri;
+          }
     spec:
       ingressClassName: nginx
+      tls:
+        - hosts:
+            - rp.doc
+          secretName: rp-doc-tls
       rules:
         - host: rp.doc
           http:
