@@ -25,11 +25,23 @@ spec:
         app.kubernetes.io/name: inventree-worker
     spec:
       serviceAccountName: inventree
+      
+      # Если пакет публичный, imagePullSecrets не нужен. 
+      # Если он приватный, раскомментируйте блок ниже и убедитесь, что секрет создан:
+      # imagePullSecrets:
+      #   - name: ghcr-pull-secret
+      
       containers:
         - name: inventree
-          image: inventree/inventree:1.4.3
-          imagePullPolicy: IfNotPresent
+          # ИЗМЕНЕНО: Указан ваш кастомный образ. 
+          # ВАЖНО: Замените sha-1c4f6ff на хеш из ПОСЛЕДНЕГО успешного (зеленого) запуска GitHub Actions!
+          image: ghcr.io/sharkdeveloper/rp.store:latest
+          
+          # ИЗМЕНЕНО: Always гарантирует, что Kubernetes проверит наличие новой версии образа
+          imagePullPolicy: Always
+          
           command: ["invoke", "worker"]
+          
           env:
             - name: INVENTREE_SITE_URL
               value: http://rp.store
