@@ -25,10 +25,17 @@ spec:
         app.kubernetes.io/name: inventree
     spec:
       serviceAccountName: inventree
+      
+      # ДОБАВЛЕНО: Секрет для скачивания образа из GHCR
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+        
       initContainers:
         - name: init
-          image: inventree/inventree:1.4.3
-          imagePullPolicy: IfNotPresent
+          # ИЗМЕНЕНО: Указан ваш кастомный образ
+          image: ghcr.io/sharkdeveloper/rp.store:sha-1c4f6ff
+          # РЕКОМЕНДУЕТСЯ: Always гарантирует, что K8s всегда проверит наличие новой сборки по этому тегу
+          imagePullPolicy: Always
           command: ["/bin/sh", "-c"]
           args:
             - |
@@ -70,8 +77,10 @@ spec:
               mountPath: /home/inventree/data
       containers:
         - name: inventree
-          image: inventree/inventree:1.4.3
-          imagePullPolicy: IfNotPresent
+          # ИЗМЕНЕНО: Указан ваш кастомный образ
+          image: ghcr.io/sharkdeveloper/rp.store:sha-1c4f6ff
+          # РЕКОМЕНДУЕТСЯ: Always для кастомных сборок
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8000
@@ -126,7 +135,9 @@ spec:
           volumeMounts:
             - name: inventree-data
               mountPath: /home/inventree/data
+              
         - name: inventree-proxy
+          # НЕ ИЗМЕНЕНО: Оставляем стандартный nginx
           image: nginx:stable
           imagePullPolicy: IfNotPresent
           ports:
