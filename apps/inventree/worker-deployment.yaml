@@ -35,7 +35,7 @@ spec:
         - name: inventree
           # ИЗМЕНЕНО: Указан ваш кастомный образ. 
           # ВАЖНО: Замените sha-1c4f6ff на хеш из ПОСЛЕДНЕГО успешного (зеленого) запуска GitHub Actions!
-          image: ghcr.io/sharkdeveloper/rp.store:latest
+          image: ghcr.io/sharkdeveloper/rp.store:master
           
           # ИЗМЕНЕНО: Always гарантирует, что Kubernetes проверит наличие новой версии образа
           imagePullPolicy: Always
