@@ -114,11 +114,7 @@ extraObjects:
       annotations:
         nginx.ingress.kubernetes.io/proxy-body-size: "50m"
         nginx.ingress.kubernetes.io/ssl-redirect: "false"
-        # Редирект HTTPS → HTTP (после успешного TLS handshake)
-        nginx.ingress.kubernetes.io/configuration-snippet: |
-          if ($scheme = https) {
-            return 301 http://$host$request_uri;
-          }
+        # Snippet удален. NGINX автоматически завершит TLS и отправит HTTP в под.
     spec:
       ingressClassName: nginx
       tls:
