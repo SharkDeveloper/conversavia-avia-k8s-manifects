@@ -44,7 +44,7 @@ spec:
           
           env:
             - name: INVENTREE_SITE_URL
-              value: http://rp.store
+              value: https://rp.store
             - name: INVENTREE_ALLOWED_HOSTS
               value: '*'
             - name: INVENTREE_CORS_ORIGIN_WHITELIST
