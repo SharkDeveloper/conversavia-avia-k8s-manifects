@@ -29,7 +29,7 @@ spec:
       initContainers:
         - name: init
           # ИЗМЕНЕНО: Указан ваш кастомный образ
-          image: ghcr.io/sharkdeveloper/rp.store:latest
+          image: ghcr.io/sharkdeveloper/rp.store:sha-3b2ed23
           # РЕКОМЕНДУЕТСЯ: Always гарантирует, что K8s всегда проверит наличие новой сборки по этому тегу
           imagePullPolicy: Always
           command: ["/bin/sh", "-c"]
@@ -74,7 +74,7 @@ spec:
       containers:
         - name: inventree
           # ИЗМЕНЕНО: Указан ваш кастомный образ
-          image: ghcr.io/sharkdeveloper/rp.store:latest
+          image: ghcr.io/sharkdeveloper/rp.store:sha-3b2ed23
           # РЕКОМЕНДУЕТСЯ: Always для кастомных сборок
           imagePullPolicy: Always
           ports:
