@@ -9,7 +9,6 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    # Аннотацию configuration-snippet мы удалили, так как она заблокирована
 spec:
   ingressClassName: nginx
   rules:
@@ -23,3 +22,7 @@ spec:
                 name: inventree
                 port:
                   number: 80
+# tls:
+#  - hosts:
+#      - rp.store
+#    secretName: inventree-tls
