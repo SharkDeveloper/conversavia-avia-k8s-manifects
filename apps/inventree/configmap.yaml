@@ -5,8 +5,8 @@ metadata:
   namespace: inventree
 data:
   default.conf: |-
+    # Блокируем запросы с неверным Host для предотвращения спуфинга
     server {
-      # Если хост не совпадает, закрываем соединение для предотвращения спуфинга
       listen 80 default_server;
       return 444;
     }
@@ -18,18 +18,15 @@ data:
       keepalive_timeout 5;
       root /var/www/;
 
-      # 1. ⛔ ЗАПРЕЩАЕМ кэширование HTML-файлов (включая index.html)
-      # Это гарантирует, что браузер ВСЕГДА будет скачивать свежий HTML,
-      # в котором прописаны актуальные хеши новых JS/CSS файлов.
+      # 1. Запрет кэширования HTML-файлов (на случай, если Nginx отдает их напрямую)
       location ~* \.html$ {
         add_header Cache-Control "no-cache, no-store, must-revalidate";
         add_header Pragma "no-cache";
         add_header Expires "0";
       }
 
-      # 2. 🚀 АГРЕССИВНО КЭШИРУЕМ хешированные статические файлы
-      # Поскольку их имена (например, index-BcQKOmOd.js) меняются при каждой сборке,
-      # их можно и нужно кэшировать на 1 год. Браузер даже не будет проверять их актуальность.
+      # 2. Агрессивное кэширование хешированных статических файлов (JS, CSS, изображения)
+      # Имена этих файлов меняются при каждой сборке, поэтому их можно кэшировать на 1 год.
       location ~* ^/static/.*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|json)$ {
         alias /var/www/static/;
         autoindex off;
@@ -37,7 +34,7 @@ data:
         add_header Cache-Control "public, immutable";
       }
 
-      # 3. Резервное правило для остальной статики (если есть файлы без расширений выше)
+      # 3. Резервное правило для остальной статики
       location /static/ {
         alias /var/www/static/;
         autoindex off;
@@ -45,7 +42,7 @@ data:
         add_header Cache-Control "public";
       }
 
-      # Медиафайлы требуют аутентификации
+      # 4. Медиафайлы требуют аутентификации через Django
       location /media/ {
         alias /var/www/media/;
         auth_request /auth;
@@ -59,8 +56,8 @@ data:
         proxy_set_header X-Original-URI $request_uri;
       }
 
+      # 5. Основной маршрут: если файл не найден, проксируем в Django (SPA fallback)
       location / {
-        # Проверяем, существует ли файл. Если нет (например, запрос /web) -> проксируем в Django
         try_files $uri @app;
       }
 
@@ -71,17 +68,22 @@ data:
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $http_host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_redirect off;
-        proxy_cache_bypass $http_upgrade;
         
-        # ⛔ ВАЖНО: Запрещаем самому Nginx кэшировать ответы от Django (включая index.html)
+        # КРИТИЧЕСКИ ВАЖНО: передаем оригинальный протокол от Ingress (https), 
+        # чтобы Django генерировал правильные абсолютные ссылки.
+        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+        
+        proxy_redirect off;
+        
+        # Запрещаем Nginx кэшировать ответы от Django (включая index.html)
         proxy_no_cache 1;
         proxy_cache_bypass 1;
       }
 
+      # Страницы ошибок
       error_page 500 502 503 504 /500.html;
       location = /500.html {
         root /var/www/;
+        internal;
       }
     }
