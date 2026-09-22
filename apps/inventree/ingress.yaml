@@ -9,6 +9,9 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Дополнительно: явно указываем NGINX пробрасывать схему
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header X-Forwarded-Proto $scheme;
 spec:
   ingressClassName: nginx
   rules:
@@ -22,7 +25,3 @@ spec:
                 name: inventree
                 port:
                   number: 80
-# tls:
-#  - hosts:
-#      - rp.store
-#    secretName: inventree-tls
