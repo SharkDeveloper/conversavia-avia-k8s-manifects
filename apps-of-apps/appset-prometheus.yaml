@@ -3,6 +3,9 @@ kind: ApplicationSet
 metadata:
   name: prometheus
   namespace: argocd
+  annotations:
+    # КРИТИЧНО: принудительно включаем Server-Side Apply для всего приложения
+    argocd.argoproj.io/sync-options: ServerSideApply=true
 spec:
   goTemplate: true
   goTemplateOptions:
@@ -16,6 +19,8 @@ spec:
       name: "{{ .name }}"
       finalizers:
         - resources-finalizer.argocd.argoproj.io
+      annotations:
+        argocd.argoproj.io/sync-options: ServerSideApply=true
     spec:
       project: default
       sources:
@@ -39,10 +44,3 @@ spec:
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
-          - Replace=true # Ключевое исправление для обхода лимита аннотаций CRD
-      retry:
-        limit: 5
-        backoff:
-          duration: 5s
-          factor: 2
-          maxDuration: 3m
