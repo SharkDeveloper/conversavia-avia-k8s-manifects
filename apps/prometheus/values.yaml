@@ -1,0 +1,35 @@
+# Настройки, специфичные для данного кластера
+prometheus:
+  prometheusSpec:
+    # Разрешить обнаружение любых ServiceMonitor в кластере
+    serviceMonitorSelectorNilUsesHelmValues: false
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: local-path
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+
+grafana:
+  persistence:
+    enabled: true
+    storageClassName: local-path
+  service:
+    type: NodePort
+    nodePort: 30080
+
+# Фиксы для корректного сбора метрик с kubeadm
+kubelet:
+  serviceMonitor:
+    cAdvisor: true
+    kubelet: true
+kubeControllerManager:
+  service:
+    selector:
+      component: kube-controller-manager
+kubeScheduler:
+  service:
+    selector:
+      component: kube-scheduler
