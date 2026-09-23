@@ -2,7 +2,7 @@
 
 prometheus:
   prometheusSpec:
-    # ── Обнаружение во всех namespace ──
+    # ── Обнаружение во всех пространствах имен ──
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     ruleSelectorNilUsesHelmValues: false
@@ -10,7 +10,7 @@ prometheus:
 
     # ── Хранилище ──
     retention: 15d
-    retentionSize: "40GB"
+    retentionSize: "18GB"   # меньше размера PVC (20Gi), чтобы не переполнить диск
     storageSpec:
       volumeClaimTemplate:
         spec:
@@ -20,7 +20,7 @@ prometheus:
             requests:
               storage: 20Gi
 
-    # ── Ресурсы (под ваш кластер) ──
+    # ── Ресурсы ──
     resources:
       requests:
         memory: 1Gi
@@ -29,7 +29,7 @@ prometheus:
         memory: 2Gi
 
 grafana:
-  # ИСПРАВЛЕНО: добавлен size
+  # ИСПРАВЛЕНО: добавлен размер
   persistence:
     enabled: true
     storageClassName: local-path
@@ -37,8 +37,8 @@ grafana:
   service:
     type: NodePort
     nodePort: 30080
-  # Явно задайте пароль или используйте existingSecret
-  adminPassword: "admin"   # ⚠️ смените, или уберите — тогда сгенерируется авто
+  # Явно укажите пароль или используйте existingSecret
+  adminPassword: "admin"   # ⚠️ измените или удалите — тогда пароль сгенерируется автоматически
 
 alertmanager:
   alertmanagerSpec:
@@ -52,18 +52,18 @@ alertmanager:
               storage: 5Gi
 
 # ── Фиксы для kubeadm ──
-# ИСПРАВЛЕНО: используются endpoints с IP control-plane ноды,
+# ИСПРАВЛЕНО: используются конечные точки с IP-адресом ноды control-plane,
 # т.к. в актуальных версиях чарта kubeControllerManager/kubeScheduler
 # не создают Service автоматически.
 kubeControllerManager:
   enabled: true
   endpoints:
-    - 192.168.5.87    # ← замените на IP вашей control-plane ноды
+    - 192.168.5.87   # ← замените на IP-адрес вашей ноды control-plane
 
 kubeScheduler:
   enabled: true
   endpoints:
-    - 192.168.5.87    # ← замените на IP вашей control-plane ноды
+    - 192.168.5.87   # ← замените на IP-адрес вашей управляющей ноды
 
 kubeProxy:
   enabled: true
