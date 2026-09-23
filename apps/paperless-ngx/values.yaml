@@ -155,7 +155,7 @@ extraObjects:
                 - containerPort: 9998
               resources:
                 requests:
-                  memory: "5124Mi"
+                  memory: "512Mi"
                   cpu: "200m"
                 limits:
                   memory: "1Gi"
