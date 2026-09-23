@@ -1,8 +1,16 @@
-# Настройки, специфичные для данного кластера
+# apps/prometheus/values.yaml
+
 prometheus:
   prometheusSpec:
-    # Разрешить обнаружение любых ServiceMonitor в кластере
+    # ── Обнаружение во всех namespace ──
     serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+
+    # ── Хранилище ──
+    retention: 15d
+    retentionSize: "40GB"
     storageSpec:
       volumeClaimTemplate:
         spec:
@@ -12,24 +20,63 @@ prometheus:
             requests:
               storage: 20Gi
 
+    # ── Ресурсы (под ваш кластер) ──
+    resources:
+      requests:
+        memory: 1Gi
+        cpu: 250m
+      limits:
+        memory: 2Gi
+
 grafana:
+  # ИСПРАВЛЕНО: добавлен size
   persistence:
     enabled: true
     storageClassName: local-path
+    size: 5Gi
   service:
     type: NodePort
     nodePort: 30080
+  # Явно задайте пароль или используйте existingSecret
+  adminPassword: "admin"   # ⚠️ смените, или уберите — тогда сгенерируется авто
 
-# Фиксы для корректного сбора метрик с kubeadm
+alertmanager:
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: local-path
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
+
+# ── Фиксы для kubeadm ──
+# ИСПРАВЛЕНО: используются endpoints с IP control-plane ноды,
+# т.к. в актуальных версиях чарта kubeControllerManager/kubeScheduler
+# не создают Service автоматически.
+kubeControllerManager:
+  enabled: true
+  endpoints:
+    - 192.168.5.87    # ← замените на IP вашей control-plane ноды
+
+kubeScheduler:
+  enabled: true
+  endpoints:
+    - 192.168.5.87    # ← замените на IP вашей control-plane ноды
+
+kubeProxy:
+  enabled: true
+
+kubeEtcd:
+  enabled: true
+  endpoints:
+    - 192.168.5.87
+  # Если etcd с TLS — понадобятся serviceMonitor.secure и tlsConfig
+
+# Kubelet: включить cAdvisor (по умолчанию уже true, но фиксируем явно)
 kubelet:
+  enabled: true
   serviceMonitor:
     cAdvisor: true
     kubelet: true
-kubeControllerManager:
-  service:
-    selector:
-      component: kube-controller-manager
-kubeScheduler:
-  service:
-    selector:
-      component: kube-scheduler
