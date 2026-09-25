@@ -479,7 +479,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">201</context>
         </context-group>
-        <target state="translated">Атрибуты такие как теги, корреспонденты, типы документов, пути хранения и настраиваемые поля управляются здесь. Они также могут быть созданы при редактировании документа.</target>
+        <target state="translated">Атрибуты такие как теги, шифры, типы документов, пути хранения и настраиваемые поля управляются здесь. Они также могут быть созданы при редактировании документа.</target>
       </trans-unit>
       <trans-unit id="7851939076947092983" datatype="html">
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
@@ -11582,7 +11582,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">47</context>
         </context-group>
-        <target state="translated">корреспонденты</target>
+        <target state="translated">шифры</target>
       </trans-unit>
       <trans-unit id="6360600151505327572" datatype="html">
         <source>Last used</source>
