@@ -11,4 +11,9 @@ COPY django_local_ru.po /usr/src/paperless/src/locale/ru_RU/LC_MESSAGES/django.p
 RUN cd /usr/src/paperless/src/locale/ru_RU/LC_MESSAGES/ && \
     msgfmt django.po -o django.mo
 
+# Патчим фронтенд-переводы
+RUN find /usr/src/paperless/static/frontend/ru-RU \
+         /usr/src/paperless/src/documents/static/frontend/ru-RU \
+    -type f -name '*.js' -exec sed -i 's/Корреспондент/Шифр/g' {} +
+
 USER 70
