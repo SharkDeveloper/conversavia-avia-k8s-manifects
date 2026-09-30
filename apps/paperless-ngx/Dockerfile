@@ -14,14 +14,13 @@ RUN cd /usr/src/paperless/src/locale/ru_RU/LC_MESSAGES/ && \
 # Патч фронтенда: заменяем строки прямо в скомпилированных JS-бандлах
 RUN find /usr/src/paperless/static/frontend/ru-RU \
          /usr/src/paperless/src/documents/static/frontend/ru-RU \
-    -type f -name '*.js' -exec sed -i \
+    -type f -name '*.js' -exec env LC_ALL=C.UTF-8 sed -i \
         -e 's/Корреспондент/Шифр/g' \
         -e 's/Корреспонденты/Шифры/g' \
         -e 's/Корреспондента/Шифра/g' \
-        -e 's/Корреспондентов/Шифров/г' \
+        -e 's/Корреспондентов/Шифров/g' \
         -e 's/Корреспонденту/Шифру/g' \
         -e 's/Корреспондентом/Шифром/g' \
         -e 's/Корреспонденте/Шифре/g' \
         {} +
-
 USER 70
