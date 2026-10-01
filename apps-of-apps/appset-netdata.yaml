@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: netdata
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - list:
+        elements:
+          - cluster: in-cluster
+            server: https://kubernetes.default.svc
+          # Добавьте другие кластеры при необходимости:
+          # - cluster: prod-eu
+          #   server: https://prod-eu.example.com
+  template:
+    metadata:
+      name: 'netdata-{{.cluster}}'
+      labels:
+        app: netdata
+        cluster: '{{.cluster}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://netdata.github.io/helmchart/
+        chart: netdata
+        targetRevision: 3.7.160
+        helm:
+          releaseName: netdata
+          valueFiles:
+            - values.yaml
+      destination:
+        server: '{{.server}}'
+        namespace: netdata
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
