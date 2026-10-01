@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: netdata
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://netdata.github.io/helmchart/
+    chart: netdata
+    targetRevision: 3.7.160 # Укажите актуальную версию чарта
+    helm:
+      valueFiles:
+        - values.yaml # Имя вашего файла с настройками
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: netdata
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
