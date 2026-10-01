@@ -1,0 +1,35 @@
+# values.yaml
+
+# --- Настройка хранения данных (Retention) ---
+# По умолчанию данные хранятся на Persistent Volume.
+# Убедитесь, что у вас есть StorageClass, который может создать PVC.
+# Если у вас несколько зон, это может вызвать проблемы (см. примечание ниже).
+database:
+  # Указываем ваш StorageClass, если он не 'default'
+  # storageclass: 'your-storage-class-name'
+  volumesize: 10Gi # Размер хранилища для родительского пода
+
+# --- Настройка Ingress для доступа к UI ---
+# В чарте Netdata Ingress включен по умолчанию, но укажите свой хост.
+ingress:
+  enabled: true
+  hosts:
+    - netdata.your-domain.com # Замените на ваш домен
+
+# --- Ресурсы (опционально, для контроля потребления) ---
+parent:
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+child:
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
