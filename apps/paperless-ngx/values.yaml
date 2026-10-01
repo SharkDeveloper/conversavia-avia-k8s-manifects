@@ -117,10 +117,10 @@ extraObjects:
         # Snippet удален. NGINX автоматически завершит TLS и отправит HTTP в под.
     spec:
       ingressClassName: nginx
-      # tls:
-      #   - hosts:
-      #       - rp.doc
-      #     secretName: rp-doc-tls
+      tls:
+        - hosts:
+            - rp.doc
+          secretName: rp-doc-tls
       rules:
         - host: rp.doc
           http:
