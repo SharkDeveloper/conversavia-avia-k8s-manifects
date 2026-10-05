@@ -114,7 +114,7 @@ extraObjects:
       name: paperless-ngx
       namespace: paperless-ngx
       annotations:
-        nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+        nginx.ingress.kubernetes.io/proxy-body-size: "200m"
         nginx.ingress.kubernetes.io/ssl-redirect: "false"
         # Snippet удален. NGINX автоматически завершит TLS и отправит HTTP в под.
     spec:
