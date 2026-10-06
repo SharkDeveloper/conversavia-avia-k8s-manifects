@@ -56,7 +56,7 @@ env:
   #   value: "1024"                  # МБ, заставляет ImageMagick использовать диск
    # 1. Жёстко ограничиваем ocrmypdf до 5 потоков (вместо 16)
   - name: PAPERLESS_OCR_IMAGE_DPI
-    value: "200" # Снижаем DPI с 300 до 200, это значительно уменьшает размер
+    value: "300" # Снижаем DPI с 300 до 200, это значительно уменьшает размер
   - name: PAPERLESS_OCR_USER_ARGS
     value: { "jobs": 5, "optimize": 2, "pdfa_image_compression": "jpeg", "jpeg_quality": 75 }
 
