@@ -1,7 +1,7 @@
 # apps/paperless-ngx/values.yaml
 
 image:
-  repository: ghcr.io/sharkdeveloper/conversavia-avia-k8s-manifects/paperless-ngx-rus
+  repository: sharkdeveloper/conversavia-avia-k8s-manifects/paperless-ngx-rus
   tag: "latest"
   pullPolicy: Always
 
