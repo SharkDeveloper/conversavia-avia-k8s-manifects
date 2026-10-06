@@ -49,7 +49,9 @@ env:
   - name: PAPERLESS_TASK_WORKERS
     value: "1"                    # Было 3 — каждый воркер жрёт ~1.5 ГБ при OCR
   - name: PAPERLESS_THREADS_PER_WORKER
-    value: "8"                    #  потоков на воркер             
+    value: "8"                    #  потоков на воркер     
+  - name: PAPERLESS_CONVERT_MEMORY_LIMIT
+  value: "32000000"   # 32 МБ
 
   # # --- ОГРАНИЧИВАЕМ ПАМЯТЬ IMAGEMAGICK ---
   # - name: PAPERLESS_CONVERT_MEMORY_LIMIT
