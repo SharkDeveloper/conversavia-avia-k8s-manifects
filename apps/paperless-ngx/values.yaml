@@ -45,11 +45,11 @@ env:
     
  # --- СНИЖАЕМ ПАРАЛЛЕЛИЗМ, ЧТОБЫ НЕ ЛОВИТЬ OOM ---
   - name: PAPERLESS_TASK_WORKERS
-    value: "3"                    # Было 3 — каждый воркер жрёт ~1.5 ГБ при OCR
+    value: "2"                    # Было 3 — каждый воркер жрёт ~1.5 ГБ при OCR
   - name: PAPERLESS_THREADS_PER_WORKER
-    value: "3"                    # Один поток на воркер
+    value: "1"                    # Один поток на воркер
   - name: PAPERLESS_OCR_THREADS
-    value: "3"                    # Tesseract не будет жрать все ядра и память
+    value: "1"                    # Tesseract не будет жрать все ядра и память
 
   # --- ОГРАНИЧИВАЕМ ПАМЯТЬ IMAGEMAGICK ---
   - name: PAPERLESS_CONVERT_MEMORY_LIMIT
@@ -62,7 +62,7 @@ resources:
     cpu: "500m"
   limits:
     memory: "6Gi"   # Увеличили с 1.5Gi до 2Gi для запаса при OCR
-    cpu: "5000m"
+    cpu: "3000m"
 
 # --- Права доступа ---
 podSecurityContext:
