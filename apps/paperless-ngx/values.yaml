@@ -52,6 +52,8 @@ env:
     value: "8"                    #  потоков на воркер     
   - name: PAPERLESS_CONVERT_MEMORY_LIMIT
     value: "32000000"   # 32 МБ
+  - name: PAPERLESS_WEBSERVER_WORKERS
+    value: "3"   
 
   # # --- ОГРАНИЧИВАЕМ ПАМЯТЬ IMAGEMAGICK ---
   # - name: PAPERLESS_CONVERT_MEMORY_LIMIT
