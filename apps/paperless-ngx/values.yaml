@@ -60,7 +60,7 @@ env:
   - name: PAPERLESS_OCR_IMAGE_DPI
     value: "300" # Снижаем DPI с 300 до 200, это значительно уменьшает размер
   - name: PAPERLESS_OCR_USER_ARGS
-    value: { "jobs": 5, "optimize": 2}
+    value: { "jobs": 2, "optimize": 2}
 
 # --- Ресурсы основного контейнера paperless-ngx ---
 resources:
