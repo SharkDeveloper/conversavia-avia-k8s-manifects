@@ -54,11 +54,8 @@ env:
     value: "32000000"   # 32 МБ
   - name: PAPERLESS_WEBSERVER_WORKERS
     value: "3"   
-
-  # # --- ОГРАНИЧИВАЕМ ПАМЯТЬ IMAGEMAGICK ---
-  # - name: PAPERLESS_CONVERT_MEMORY_LIMIT
-  #   value: "1024"                  # МБ, заставляет ImageMagick использовать диск
-   # 1. Жёстко ограничиваем ocrmypdf до 5 потоков (вместо 16)
+  - name: PAPERLESS_OCR_USER_ARGS
+    value: { "optimize": 0}
   - name: PAPERLESS_OCR_IMAGE_DPI
     value: "300" # Снижаем DPI с 300 до 200, это значительно уменьшает размер
 
