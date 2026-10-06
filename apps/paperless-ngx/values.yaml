@@ -59,8 +59,6 @@ env:
    # 1. Жёстко ограничиваем ocrmypdf до 5 потоков (вместо 16)
   - name: PAPERLESS_OCR_IMAGE_DPI
     value: "300" # Снижаем DPI с 300 до 200, это значительно уменьшает размер
-  - name: PAPERLESS_OCR_USER_ARGS
-    value: { "optimize": 1}
 
 # --- Ресурсы основного контейнера paperless-ngx ---
 resources:
