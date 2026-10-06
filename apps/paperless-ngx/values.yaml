@@ -47,9 +47,9 @@ env:
     
  # --- СНИЖАЕМ ПАРАЛЛЕЛИЗМ, ЧТОБЫ НЕ ЛОВИТЬ OOM ---
   - name: PAPERLESS_TASK_WORKERS
-    value: "2"                    # Было 3 — каждый воркер жрёт ~1.5 ГБ при OCR
+    value: "1"                    # Было 3 — каждый воркер жрёт ~1.5 ГБ при OCR
   - name: PAPERLESS_THREADS_PER_WORKER
-    value: "2"                    # Один поток на воркер
+    value: "6"                    # Один поток на воркер
   # - name: PAPERLESS_OCR_THREADS
   #   value: "2"                    # Tesseract не будет жрать все ядра и память
 
