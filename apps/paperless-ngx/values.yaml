@@ -67,7 +67,7 @@ resources:
     cpu: "1000m"
   limits:
     memory: "6Gi"   # Увеличили с 1.5Gi до 2Gi для запаса при OCR
-    cpu: "3000m"
+    cpu: "4000m"
 
 # --- Права доступа ---
 podSecurityContext:
