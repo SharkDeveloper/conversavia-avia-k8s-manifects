@@ -50,8 +50,8 @@ env:
     value: "1"                    # Было 3 — каждый воркер жрёт ~1.5 ГБ при OCR
   - name: PAPERLESS_THREADS_PER_WORKER
     value: "8"                    # Один поток на воркер
-  # - name: PAPERLESS_OCR_THREADS
-  #   value: "2"                    # Tesseract не будет жрать все ядра и память
+  - name: PAPERLESS_OCR_THREADS
+    value: "3"                    # Tesseract не будет жрать все ядра и память
 
   # # --- ОГРАНИЧИВАЕМ ПАМЯТЬ IMAGEMAGICK ---
   # - name: PAPERLESS_CONVERT_MEMORY_LIMIT
@@ -60,13 +60,13 @@ env:
   - name: PAPERLESS_OCR_IMAGE_DPI
     value: "300" # Снижаем DPI с 300 до 200, это значительно уменьшает размер
   - name: PAPERLESS_OCR_USER_ARGS
-    value: { "jobs": 5, "optimize": 2, "pdfa_image_compression": "jpeg", "jpeg_quality": 75 }
+    value: { "jobs": 5, "optimize": 2}
 
 # --- Ресурсы основного контейнера paperless-ngx ---
 resources:
   requests:
     memory: "1Gi"
-    cpu: "500m"
+    cpu: "1000m"
   limits:
     memory: "6Gi"   # Увеличили с 1.5Gi до 2Gi для запаса при OCR
     cpu: "3000m"
