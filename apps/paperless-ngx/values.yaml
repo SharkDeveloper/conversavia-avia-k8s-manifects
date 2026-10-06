@@ -51,7 +51,7 @@ env:
   - name: PAPERLESS_THREADS_PER_WORKER
     value: "8"                    #  потоков на воркер     
   - name: PAPERLESS_CONVERT_MEMORY_LIMIT
-  value: "32000000"   # 32 МБ
+    value: "32000000"   # 32 МБ
 
   # # --- ОГРАНИЧИВАЕМ ПАМЯТЬ IMAGEMAGICK ---
   # - name: PAPERLESS_CONVERT_MEMORY_LIMIT
