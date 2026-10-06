@@ -12,6 +12,8 @@ env:
     value: "Europe/Moscow"
   - name: PAPERLESS_OCR_LANGUAGE
     value: "eng+rus"
+  - name: PAPERLESS_OCR_MODE
+    value: "force"
   - name: PAPERLESS_CSRF_TRUSTED_ORIGINS
     value: "http://rp.doc,https://rp.doc,http://192.168.5.87:31791"
 
@@ -48,8 +50,8 @@ env:
     value: "2"                    # Было 3 — каждый воркер жрёт ~1.5 ГБ при OCR
   - name: PAPERLESS_THREADS_PER_WORKER
     value: "2"                    # Один поток на воркер
-  - name: PAPERLESS_OCR_THREADS
-    value: "2"                    # Tesseract не будет жрать все ядра и память
+  # - name: PAPERLESS_OCR_THREADS
+  #   value: "2"                    # Tesseract не будет жрать все ядра и память
 
   # # --- ОГРАНИЧИВАЕМ ПАМЯТЬ IMAGEMAGICK ---
   # - name: PAPERLESS_CONVERT_MEMORY_LIMIT
