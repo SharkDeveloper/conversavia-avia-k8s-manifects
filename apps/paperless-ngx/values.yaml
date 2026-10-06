@@ -123,6 +123,9 @@ extraObjects:
       annotations:
         nginx.ingress.kubernetes.io/proxy-body-size: "200m"
         nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
         # Snippet удален. NGINX автоматически завершит TLS и отправит HTTP в под.
     spec:
       ingressClassName: nginx
