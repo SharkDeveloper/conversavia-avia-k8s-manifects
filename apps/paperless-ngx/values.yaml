@@ -11,7 +11,7 @@ env:
   - name: PAPERLESS_TIME_ZONE
     value: "Europe/Moscow"
   - name: PAPERLESS_OCR_LANGUAGE
-    value: "eng+rus"
+    value: "rus"
   - name: PAPERLESS_OCR_MODE
     value: "redo"
   - name: PAPERLESS_CSRF_TRUSTED_ORIGINS
@@ -58,6 +58,13 @@ env:
     value: { "optimize": 0}
   - name: PAPERLESS_OCR_IMAGE_DPI
     value: "300" # Снижаем DPI с 300 до 200, это значительно уменьшает размер
+    # Отключаем проверку почты (если не используете импорт из email)
+  - name: PAPERLESS_EMAIL_TASK_CRON
+    value: ""                      # пустое значение отключает задачу
+
+  # Отключаем проверку workflows (если не используете запланированные workflows)
+  # - name: PAPERLESS_WORKFLOW_SCHEDULE_TASK_CRON
+  #   value: ""                      # пустое значение отключает задачу
 
 # --- Ресурсы основного контейнера paperless-ngx ---
 resources:
