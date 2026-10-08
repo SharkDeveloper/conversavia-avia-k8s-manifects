@@ -54,6 +54,8 @@ env:
     value: "32000000"   # 32 МБ
   - name: PAPERLESS_WEBSERVER_WORKERS
     value: "3"   
+  - name: PAPERLESS_OCR_OUTPUT_TYPE
+    value: "pdf" 
   - name: PAPERLESS_OCR_USER_ARGS
     value: { "optimize": 0}
   - name: PAPERLESS_OCR_IMAGE_DPI
@@ -62,9 +64,6 @@ env:
   - name: PAPERLESS_EMAIL_TASK_CRON
     value: ""                      # пустое значение отключает задачу
 
-  # Отключаем проверку workflows (если не используете запланированные workflows)
-  # - name: PAPERLESS_WORKFLOW_SCHEDULE_TASK_CRON
-  #   value: ""                      # пустое значение отключает задачу
 
 # --- Ресурсы основного контейнера paperless-ngx ---
 resources:
