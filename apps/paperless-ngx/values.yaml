@@ -49,11 +49,11 @@ env:
     
  # --- СНИЖАЕМ ПАРАЛЛЕЛИЗМ, ЧТОБЫ НЕ ЛОВИТЬ OOM ---
   - name: PAPERLESS_TASK_WORKERS
-    value: "1"                    # Было 3 — каждый воркер жрёт ~1.5 ГБ при OCR
+    value: "2"                    # Было 3 — каждый воркер жрёт ~1.5 ГБ при OCR
   - name: PAPERLESS_THREADS_PER_WORKER
-    value: "6"                    #  потоков на воркер     
+    value: "4"                    #  потоков на воркер     
   - name: PAPERLESS_CONVERT_MEMORY_LIMIT
-    value: "32000000"   # 32 МБ
+    value: "512000000"   # 32 МБ
   - name: PAPERLESS_WEBSERVER_WORKERS
     value: "3"   
   - name: PAPERLESS_OCR_OUTPUT_TYPE
