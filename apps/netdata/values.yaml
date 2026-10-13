@@ -6,6 +6,9 @@ ingress:
 
 # --- Ресурсы Parent-пода ---
 parent:
+  service:
+    type: NodePort
+    nodePort: 30199
   resources:
     requests:
       cpu: "100m"
@@ -26,6 +29,6 @@ child:
 
 # --- Хранение данных ---
 # Укажите ваш StorageClass, если он не 'default'
-# database:
-#   storageclass: 'your-single-zone-storage-class'
+database:
   volumesize: 10Gi
+#   storageclass: 'your-single-zone-storage-class'
