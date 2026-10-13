@@ -1,12 +1,5 @@
 # values.yaml
 
-# --- Настройка Ingress для доступа к UI ---
-ingress:
-  enabled: true
-  hosts:
-    - rp.store
-    - rp.doc # Замените на ваш домен
-
 # --- Ресурсы Parent-пода ---
 parent:
   resources:
