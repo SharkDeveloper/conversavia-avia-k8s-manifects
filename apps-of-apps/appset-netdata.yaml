@@ -29,7 +29,7 @@ spec:
         helm:
           releaseName: netdata
           valueFiles:
-            - values.yaml
+              - $values/apps/netdata/values.yaml 
       destination:
         server: '{{.server}}'
         namespace: netdata
