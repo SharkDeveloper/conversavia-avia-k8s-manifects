@@ -1,5 +1,9 @@
 # values.yaml
 
+# --- Ingress не нужен, отключаем ---
+ingress:
+  enabled: false
+
 # --- Ресурсы Parent-пода ---
 parent:
   resources:
