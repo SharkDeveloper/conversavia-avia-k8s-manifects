@@ -2,13 +2,15 @@
 
 # --- Ingress не нужен, отключаем ---
 ingress:
-  enabled: false
-
+  enabled: true
+  className: nginx          # ← новый способ, работает с nginx-ingress ≥ 1.0
+  hosts:
+    - host: 192.168.5.87  # ← или ваш реальный домен/поддомен
+      paths:
+        - path: /
+          pathType: Prefix
 # --- Ресурсы Parent-пода ---
 parent:
-  service:
-    type: NodePort
-    nodePort: 30199
   resources:
     requests:
       cpu: "100m"
