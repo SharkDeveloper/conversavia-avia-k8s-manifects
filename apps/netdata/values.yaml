@@ -1,14 +1,15 @@
 # values.yaml
 
-# --- Ingress не нужен, отключаем ---
+# Отключаем Ingress, чтобы не было конфликтов
 ingress:
-  enabled: true
-  className: nginx          # ← новый способ, работает с nginx-ingress ≥ 1.0
-  hosts:
-    - host: 192.168.5.87  # ← или ваш реальный домен/поддомен
-      paths:
-        - path: /
-          pathType: Prefix
+  enabled: false
+
+# Настраиваем сервис
+service:
+  type: NodePort
+  # Можно указать конкретный порт, например 30199,
+  # или оставить пустым, и Kubernetes выделит случайный.
+  nodePort: 30199
 # --- Ресурсы Parent-пода ---
 parent:
   resources:
