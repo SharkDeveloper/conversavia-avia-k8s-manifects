@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: netdata
+  name: netdata-set
   namespace: argocd
 spec:
   goTemplate: true
