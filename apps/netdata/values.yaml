@@ -1,35 +1,43 @@
-# values.yaml
-
-# Отключаем Ingress, чтобы не было конфликтов
-ingress:
-  enabled: false
-
-# Настраиваем сервис
-service:
-  type: NodePort
-  port: 19999
-# --- Ресурсы Parent-пода ---
-parent:
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "256Mi"
-    limits:
-      cpu: "1"
-      memory: "1Gi"
-
-# --- Ресурсы Child-подов (DaemonSet) ---
-child:
-  resources:
-    requests:
-      cpu: "50m"
-      memory: "128Mi"
-    limits:
-      cpu: "500m"
-      memory: "512Mi"
-
-# --- Хранение данных ---
-# Укажите ваш StorageClass, если он не 'default'
-database:
-  volumesize: 10Gi
-#   storageclass: 'your-single-zone-storage-class'
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: netdata-set
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - list:
+        elements:
+          - cluster: in-cluster
+            server: https://kubernetes.default.svc
+  template:
+    metadata:
+      name: 'netdata-{{.cluster}}'
+      labels:
+        app: netdata
+        cluster: '{{.cluster}}'
+    spec:
+      project: default
+      sources:
+        # Источник 1: Helm-чарт Netdata
+        - repoURL: https://netdata.github.io/helmchart/
+          chart: netdata
+          targetRevision: 3.7.160
+          helm:
+            releaseName: netdata
+            valueFiles:
+              - $values/apps/netdata/values.yaml   # Ссылаемся на файл из второго источника
+        # Источник 2: Ваш Git-репозиторий с values.yaml
+        - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
+          targetRevision: master                       # Убедитесь, что ветка master, а не main
+          ref: values                                  # Эта ссылка создает $values
+      destination:
+        server: '{{.server}}'
+        namespace: netdata
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
