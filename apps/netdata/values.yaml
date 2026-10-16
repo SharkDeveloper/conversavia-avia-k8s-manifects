@@ -7,9 +7,7 @@ ingress:
 # Настраиваем сервис
 service:
   type: NodePort
-  # Можно указать конкретный порт, например 30199,
-  # или оставить пустым, и Kubernetes выделит случайный.
-  nodePort: 30199
+  port: 19999
 # --- Ресурсы Parent-пода ---
 parent:
   resources:
