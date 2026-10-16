@@ -19,17 +19,14 @@ spec:
         cluster: '{{.cluster}}'
     spec:
       project: default
-      sources:                                          # ← sources (мн.ч.)
-        - repoURL: https://netdata.github.io/helmchart/
-          chart: netdata
-          targetRevision: 3.7.160
-          helm:
-            releaseName: netdata
-            valueFiles:
-              - $values/apps/netdata/values.yaml         # ← $values
-        - repoURL: https://github.com/ВАШ_РЕПО.git       # ← ВАШ репо с values.yaml
-          targetRevision: main                            # ← ваша ветка
-          ref: values                                     # ← ref: values
+      source:
+        repoURL: https://netdata.github.io/helmchart/
+        chart: netdata
+        targetRevision: 3.7.160
+        helm:
+          releaseName: netdata
+          valueFiles:
+              - $values/apps/netdata/values.yaml                                # ← ref: values
       destination:
         server: '{{.server}}'
         namespace: netdata
