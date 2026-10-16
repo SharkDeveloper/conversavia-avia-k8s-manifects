@@ -19,14 +19,19 @@ spec:
         cluster: '{{.cluster}}'
     spec:
       project: default
-      source:
-        repoURL: https://netdata.github.io/helmchart/
-        chart: netdata
-        targetRevision: 3.7.160
-        helm:
-          releaseName: netdata
-          valueFiles:
-              - $values/apps/netdata/values.yaml                                # ← ref: values
+      sources:
+        # Источник 1: Helm-чарт Netdata
+        - repoURL: https://netdata.github.io/helmchart/
+          chart: netdata
+          targetRevision: 3.7.160
+          helm:
+            releaseName: netdata
+            valueFiles:
+              - $values/apps/netdata/values.yaml   # Ссылаемся на файл из второго источника
+        # Источник 2: Ваш Git-репозиторий с values.yaml
+        - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
+          targetRevision: master                       # Убедитесь, что ветка master, а не main
+          ref: values                                  # Эта ссылка создает $values
       destination:
         server: '{{.server}}'
         namespace: netdata
