@@ -11,9 +11,6 @@ spec:
         elements:
           - cluster: in-cluster
             server: https://kubernetes.default.svc
-          # Добавьте другие кластеры при необходимости:
-          # - cluster: prod-eu
-          #   server: https://prod-eu.example.com
   template:
     metadata:
       name: 'netdata-{{.cluster}}'
@@ -22,14 +19,19 @@ spec:
         cluster: '{{.cluster}}'
     spec:
       project: default
-      source:
-        repoURL: https://netdata.github.io/helmchart/
-        chart: netdata
-        targetRevision: 3.7.160
-        helm:
-          releaseName: netdata
-          valueFiles:
-              - $values/apps/netdata/values.yaml 
+      sources:
+        # Источник 1: Helm-чарт
+        - repoURL: https://netdata.github.io/helmchart/
+          chart: netdata
+          targetRevision: 3.7.160
+          helm:
+            releaseName: netdata
+            valueFiles:
+              - $values/apps/netdata/values.yaml
+        # Источник 2: Git-репозиторий с values
+        - repoURL: https://github.com/ВАШ_РЕПОЗИТОРИЙ.git   # ← замените на свой
+          targetRevision: main                                # ← замените на свою ветку
+          ref: values
       destination:
         server: '{{.server}}'
         namespace: netdata
