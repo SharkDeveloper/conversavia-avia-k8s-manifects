@@ -53,7 +53,7 @@ env:
   - name: PAPERLESS_THREADS_PER_WORKER
     value: "4"                    #  потоков на воркер     
   - name: PAPERLESS_CONVERT_MEMORY_LIMIT
-    value: "512000000"   # 32 МБ
+    value: "200000000"   # 200 mb
   - name: PAPERLESS_WEBSERVER_WORKERS
     value: "3"   
   - name: PAPERLESS_OCR_OUTPUT_TYPE
