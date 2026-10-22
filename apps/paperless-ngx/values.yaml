@@ -59,12 +59,17 @@ env:
   - name: PAPERLESS_OCR_OUTPUT_TYPE
     value: "pdf" 
   - name: PAPERLESS_OCR_USER_ARGS
-    value: { "optimize": 0}
+    value: { "optimize": 0, "tesseract_timeout": 900} # 15 минут на обработку файла в ocr
   - name: PAPERLESS_OCR_IMAGE_DPI
     value: "300" # Снижаем DPI с 300 до 200, это значительно уменьшает размер
     # Отключаем проверку почты (если не используете импорт из email)
   - name: PAPERLESS_EMAIL_TASK_CRON
     value: ""                      # пустое значение отключает задачу
+
+  - name: PAPERLESS_CELERY_TASK_TIME_LIMIT
+    value: "3600"      # Жесткий лимит: 1 час
+  - name: PAPERLESS_CELERY_TASK_SOFT_TIME_LIMIT
+    value: "3300"      # Мягкий лимит: 55 минут (должен быть меньше жесткого)
 
 
 # --- Ресурсы основного контейнера paperless-ngx ---
