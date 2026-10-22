@@ -133,7 +133,7 @@ extraObjects:
       name: paperless-ngx
       namespace: paperless-ngx
       annotations:
-        nginx.ingress.kubernetes.io/proxy-body-size: "200m"
+        nginx.ingress.kubernetes.io/proxy-body-size: "300m"
         nginx.ingress.kubernetes.io/ssl-redirect: "false"
         nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
         nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
