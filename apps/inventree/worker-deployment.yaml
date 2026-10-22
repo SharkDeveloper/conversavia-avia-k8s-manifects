@@ -57,6 +57,8 @@ spec:
               value: '{"mobile_mode": "allow-always"}'
             - name: INVENTREE_PUBLIC_ACCESS
               value: "True"
+            - name: INVENTREE_SECURE_HSTS_SECONDS
+              value: "0"
             - name: INVENTREE_CACHE_ENABLED
               value: "True"
             - name: INVENTREE_PLUGINS_ENABLED
