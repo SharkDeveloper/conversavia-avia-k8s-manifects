@@ -64,7 +64,7 @@ env:
     value: "300" # Снижаем DPI с 300 до 200, это значительно уменьшает размер
     # Отключаем проверку почты (если не используете импорт из email)
   - name: PAPERLESS_EMAIL_TASK_CRON
-    value: "0 0 31 2 *" 
+    value: "disable" 
 
   - name: PAPERLESS_CELERY_TASK_TIME_LIMIT
     value: "3600"      # Жесткий лимит: 1 час
