@@ -4,6 +4,7 @@ metadata:
   name: nginx-proxy-config
   namespace: inventree
 data:
+  hsts: "false"
   default.conf: |-
     server {
       # If none of the hosts match below, close the connection
