@@ -38,7 +38,7 @@ spec:
               invoke migrate && invoke static
           env:
             - name: INVENTREE_SITE_URL
-              value: http://rp.store
+              value: "http://rp.store, http://192.168.5.87"
             - name: INVENTREE_ALLOWED_HOSTS
               value: '*'
             - name: INVENTREE_CORS_ORIGIN_WHITELIST
