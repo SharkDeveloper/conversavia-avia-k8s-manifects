@@ -9,6 +9,8 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 250m
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300" # 5 min
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
 spec:
   ingressClassName: nginx
   rules:
