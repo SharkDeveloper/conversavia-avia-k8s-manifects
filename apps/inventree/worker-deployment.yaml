@@ -81,6 +81,8 @@ spec:
               value: inventree
             - name: INVENTREE_DB_PASSWORD
               value: postgres
+            - name: INVENTREE_DEBUG
+              value: "False"
           resources:
             requests:
               memory: "762Mi"
