@@ -17,6 +17,11 @@ env:
   - name: PAPERLESS_CSRF_TRUSTED_ORIGINS
     value: "http://rp.doc,https://rp.doc,http://192.168.5.87:31791"
 
+  - name: PAPERLESS_ENABLE_HTTP_REMOTE_USER
+    value: "true"
+  - name: PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME
+    value: "HTTP_REMOTE_USER"  # Это соответствует заголовку Remote-User
+
   - name: PAPERLESS_REDIS
     value: "redis://paperless-redis:6379"
   - name: PAPERLESS_READ_CACHE_ENABLED
