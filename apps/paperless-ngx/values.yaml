@@ -144,13 +144,9 @@ extraObjects:
         nginx.ingress.kubernetes.io/proxy-send-timeout: "900"
         nginx.ingress.kubernetes.io/proxy-read-timeout: "900"
         # Snippet удален. NGINX автоматически завершит TLS и отправит HTTP в под.
-        # Логика: ПК -> форма входа, не-ПК -> авто-вход
-        # Логика: ПК -> форма входа, не-ПК -> авто-вход
-        nginx.ingress.kubernetes.io/configuration-snippet: |
-          # Если User-Agent НЕ похож на десктопную ОС, добавляем заголовок для авто-входа
-          if ($http_user_agent !~* "windows nt|macintosh|x11") {
-              proxy_set_header Remote-User "auto_user";
-          }
+        nginx.ingress.kubernetes.io/proxy-set-header: |
+          Remote-User "auto_user"
+
     spec:
       ingressClassName: nginx
       tls:
