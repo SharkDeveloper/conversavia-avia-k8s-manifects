@@ -4,7 +4,7 @@ metadata:
   name: inventree-backup-to-bitrix
   namespace: inventree
 spec:
-  schedule: "30 8 * * *"          # UTC. Бэкапы создаются в 07:53 UTC → запуск в 08:30
+  schedule: "00 8 * * *"          # UTC. Бэкапы создаются в 07:53 UTC → запуск в 08:00
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
