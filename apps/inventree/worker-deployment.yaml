@@ -83,6 +83,8 @@ spec:
               value: postgres
             - name: INVENTREE_DEBUG
               value: "False"
+            - name: INVENTREE_TIMEZONE
+              value: "Europe/Moscow"
           resources:
             requests:
               memory: "762Mi"
