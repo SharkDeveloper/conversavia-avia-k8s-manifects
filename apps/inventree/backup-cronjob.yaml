@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: inventree-backup-to-bitrix
+  namespace: inventree
+spec:
+  schedule: "30 8 * * *"          # UTC. Бэкапы создаются в 07:53 UTC → запуск в 08:30
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          nodeSelector:
+            kubernetes.io/hostname: convers-avia-k8s-node   # PV на local-path, фиксируем узел
+          containers:
+            - name: rclone-upload
+              image: rclone/rclone:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e
+                  echo "=== Start upload $(date) ==="
+
+                  # 1. Копируем только свежий бэкап БД (созданный за последние 24 ч)
+                  #    bitrix: = папка "Бекапы" на Диске (из url в rclone.conf)
+                  rclone copy /backups bitrix: \
+                    --include "InvenTree-db-*.psql.bin.gz*" \
+                    --max-age 1d \
+                    --config /etc/rclone/rclone.conf \
+                    --log-level INFO
+
+                  # 2. Удаляем с Диска старые бэкапы БД (старше 24 ч)
+                  rclone delete bitrix: \
+                    --include "InvenTree-db-*.psql.bin.gz*" \
+                    --min-age 1d \
+                    --config /etc/rclone/rclone.conf \
+                    --log-level INFO
+
+                  echo "=== Done $(date) ==="
+              volumeMounts:
+                - name: backups
+                  mountPath: /backups
+                  subPath: backup
+                  readOnly: true
+                - name: rclone-config
+                  mountPath: /etc/rclone
+                  readOnly: true
+              resources:
+                requests: { memory: "128Mi", cpu: "100m" }
+                limits:   { memory: "512Mi", cpu: "500m" }
+          volumes:
+            - name: backups
+              persistentVolumeClaim:
+                claimName: inventree-data
+            - name: rclone-config
+              secret:
+                secretName: rclone-config
