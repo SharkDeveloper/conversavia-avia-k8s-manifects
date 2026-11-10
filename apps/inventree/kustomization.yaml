@@ -11,3 +11,5 @@ resources:
   - serviceaccount.yaml
   - ingress.yaml
   - ingress-deploy.yaml     # уже существующий у вас доп. Ingress по IP
+  - backup-cronjob.yaml
+  
