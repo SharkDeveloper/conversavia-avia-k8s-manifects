@@ -65,8 +65,6 @@ spec:
               value: postgres
             - name: INVENTREE_DEBUG
               value: "False"
-            - name: INVENTREE_TIMEZONE
-              value: "Europe/Moscow"
           resources:
             requests:
               memory: "512Mi"
@@ -124,6 +122,8 @@ spec:
               value: inventree
             - name: INVENTREE_DB_PASSWORD
               value: postgres
+            - name: INVENTREE_TIMEZONE
+              value: "Europe/Moscow"
           envFrom:
             - secretRef:
                 name: inventree-admin-secret
