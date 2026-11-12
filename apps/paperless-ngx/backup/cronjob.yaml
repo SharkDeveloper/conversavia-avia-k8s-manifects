@@ -51,7 +51,7 @@ spec:
                   tar czf "/work/Paperless-data-$TS.tar.gz" -C /storage data
 
                   # media (большой) — пакуем и режем на части по 500 MiB
-                  tar czf - -C /media . | split -b 500M -d - "/work/Paperless-media-$TS.tar.gz.part-"
+                  tar czf - -C /media . | split -b 500M -a - "/work/Paperless-media-$TS.tar.gz.part-"
 
                   # загружаем всё из /work
                   for f in /work/Paperless-*; do
