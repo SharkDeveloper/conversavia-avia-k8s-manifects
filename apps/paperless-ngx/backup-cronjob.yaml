@@ -1,0 +1,76 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: paperless-backup-to-bitrix
+  namespace: paperless-ngx
+spec:
+  schedule: "30 8 * * *"          # 11:30 MSK, не пересекается с InvenTree (08:00 UTC)
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 10800
+      template:
+        spec:
+          restartPolicy: OnFailure
+          nodeSelector:
+            kubernetes.io/hostname: convers-avia-k8s-node
+          initContainers:
+            - name: pg-dump
+              image: postgres:16-alpine
+              command: ["/bin/sh","-c"]
+              args:
+                - |
+                  set -euo pipefail
+                  TS=$(date -u +%Y-%m-%d-%H%M%S)
+                  echo "$TS" > /work/TS
+                  PGPASSWORD="$PGPASSWORD" pg_dump \
+                    -h paperless-postgresql -U paperless -d paperless \
+                    -Fc -f "/work/Paperless-db-$TS.pgcustom"
+              env:
+                - name: PGPASSWORD
+                  value: "paperless"
+                - name: TZ
+                  value: "Europe/Moscow"
+              volumeMounts:
+                - { name: work, mountPath: /work }
+          containers:
+            - name: backup
+              image: rclone/rclone:latest
+              command: ["/bin/sh","-c"]
+              args:
+                - |
+                  set -euo pipefail
+                  TS=$(cat /work/TS)
+                  DEST="bitrix:Бекапы/Paperless"
+                  tar czf "/work/Paperless-media-$TS.tar.gz" -C /media .
+                  tar czf "/work/Paperless-data-$TS.tar.gz"  -C /storage data
+                  for f in /work/Paperless-*-"$TS".*; do
+                    rclone copy "$f" "$DEST/" -v
+                  done
+                  rclone delete "$DEST/" --min-age 7d -v
+                  rm -rf /work/*
+              env:
+                - name: RCLONE_CONFIG
+                  value: /config/rclone/rclone.conf
+                - name: TZ
+                  value: "Europe/Moscow"
+              volumeMounts:
+                - { name: media,         mountPath: /media,          readOnly: true }
+                - { name: storage,       mountPath: /storage,        readOnly: true }
+                - { name: work,          mountPath: /work }
+                - { name: rclone-config, mountPath: /config/rclone,  readOnly: true }
+              resources:
+                requests: { cpu: 200m, memory: 256Mi }
+                limits:   { cpu: 2000m, memory: 2Gi }
+          volumes:
+            - name: media
+              persistentVolumeClaim: { claimName: paperless-ngx-media }
+            - name: storage
+              persistentVolumeClaim: { claimName: paperless-ngx-storage }
+            - name: work
+              emptyDir: { sizeLimit: 60Gi }
+            - name: rclone-config
+              secret: { secretName: rclone-config }
