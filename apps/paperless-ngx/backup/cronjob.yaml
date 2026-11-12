@@ -50,11 +50,16 @@ spec:
                   # data (небольшой) — целиком
                   tar czf "/work/Paperless-data-$TS.tar.gz" -C /storage data
 
-                  # media (большой) — пакуем и режем на части по 500 MiB
-                  tar czf - -C /media . | split -b 500M -a - "/work/Paperless-media-$TS.tar.gz.part-"
+                  # media (большой): tar → split → rm исходного
+                  # BusyBox split не умеет -d и не читает '-', поэтому только так
+                  tar czf "/work/Paperless-media-$TS.tar.gz" -C /media .
+                  split -b 500M -a 3 \
+                    "/work/Paperless-media-$TS.tar.gz" \
+                    "/work/Paperless-media-$TS.tar.gz.part-"
+                  rm -f "/work/Paperless-media-$TS.tar.gz"
 
-                  # загружаем всё из /work
-                  for f in /work/Paperless-*; do
+                  # загружаем всё, что относится к текущему TS
+                  for f in /work/Paperless-*"$TS"*; do
                     rclone copy "$f" "$DEST/" --config /config/rclone/rclone.conf -v
                   done
 
@@ -85,6 +90,6 @@ spec:
             - name: storage
               persistentVolumeClaim: { claimName: paperless-ngx-storage }
             - name: work
-              emptyDir: { sizeLimit: 30Gi }
+              emptyDir: { sizeLimit: 40Gi }
             - name: rclone-config
               secret: { secretName: rclone-config }
