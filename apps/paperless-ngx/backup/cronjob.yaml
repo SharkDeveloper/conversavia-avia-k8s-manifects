@@ -51,9 +51,9 @@ spec:
                   tar czf "/work/Paperless-data-$TS.tar.gz" -C /storage data
 
                   # media (большой): tar → split → rm исходного
-                  # BusyBox split не умеет -d и не читает '-', поэтому только так
+                  # BusyBox split понимает только строчные k/m, не -d и не '-'
                   tar czf "/work/Paperless-media-$TS.tar.gz" -C /media .
-                  split -b 500M -a 3 \
+                  split -b 500m -a 3 \
                     "/work/Paperless-media-$TS.tar.gz" \
                     "/work/Paperless-media-$TS.tar.gz.part-"
                   rm -f "/work/Paperless-media-$TS.tar.gz"
