@@ -30,7 +30,7 @@ spec:
                   #    bitrix: = папка "Бекапы" на Диске (из url в rclone.conf)
                   rclone copy /backups bitrix: \
                     --include "InvenTree-db-*.psql.bin.gz*" \
-                    --include "InvenTree-media-*.tar.gz"\
+                    --include "InvenTree-media-*.tar.gz" \
                     --max-age 1d \
                     --config /etc/rclone/rclone.conf \
                     --log-level INFO
@@ -38,7 +38,7 @@ spec:
                   # 2. Удаляем с Диска старые бэкапы БД (старше 24 ч)
                   rclone delete bitrix: \
                     --include "InvenTree-db-*.psql.bin.gz*" \
-                    --include "InvenTree-media-*.tar.gz"\
+                    --include "InvenTree-media-*.tar.gz" \
                     --min-age 1d \
                     --config /etc/rclone/rclone.conf \
                     --log-level INFO
