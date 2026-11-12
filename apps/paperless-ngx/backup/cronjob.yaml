@@ -44,7 +44,7 @@ spec:
                 - |
                   set -euo pipefail
                   TS=$(cat /work/TS)
-                  DEST="bitrix:Бекапы/Paperless"
+                  DEST="bitrix:Paperless"     # было: bitrix:Бекапы/Paperless
                   tar czf "/work/Paperless-media-$TS.tar.gz" -C /media .
                   tar czf "/work/Paperless-data-$TS.tar.gz"  -C /storage data
                   for f in /work/Paperless-*-"$TS".*; do
