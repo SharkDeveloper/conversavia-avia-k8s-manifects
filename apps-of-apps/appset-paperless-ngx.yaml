@@ -28,6 +28,9 @@ spec:
         - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
           targetRevision: HEAD
           ref: values
+        - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
+          targetRevision: HEAD
+          path: apps/paperless-ngx/backup-cronjob.yaml
       destination:
         server: https://kubernetes.default.svc
         namespace: paperless-ngx
