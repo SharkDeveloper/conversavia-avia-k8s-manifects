@@ -4,7 +4,7 @@ metadata:
   name: paperless-backup-to-bitrix
   namespace: paperless-ngx
 spec:
-  schedule: "30 8 * * *"          # 11:30 MSK, не пересекается с InvenTree (08:00 UTC)
+  schedule: "30 8 * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -44,14 +44,28 @@ spec:
                 - |
                   set -euo pipefail
                   TS=$(cat /work/TS)
-                  DEST="bitrix:Paperless"     # было: bitrix:Бекапы/Paperless
-                  tar czf "/work/Paperless-media-$TS.tar.gz" -C /media .
-                  tar czf "/work/Paperless-data-$TS.tar.gz"  -C /storage data
-                  for f in /work/Paperless-*-"$TS".*; do
-                    rclone copy "$f" "$DEST/" -v
+                  DEST="bitrix:Paperless"
+                  echo "=== Start $(date) TS=$TS ==="
+
+                  # data (небольшой) — целиком
+                  tar czf "/work/Paperless-data-$TS.tar.gz" -C /storage data
+
+                  # media (большой) — пакуем и режем на части по 500 MiB
+                  tar czf - -C /media . | split -b 500M -d - "/work/Paperless-media-$TS.tar.gz.part-"
+
+                  # загружаем всё из /work
+                  for f in /work/Paperless-*; do
+                    rclone copy "$f" "$DEST/" --config /config/rclone/rclone.conf -v
                   done
-                  rclone delete "$DEST/" --min-age 7d -v
+
+                  # ротация: удаляем старше 7 дней
+                  rclone delete "$DEST/" \
+                    --include "Paperless-*" \
+                    --min-age 7d \
+                    --config /config/rclone/rclone.conf -v
+
                   rm -rf /work/*
+                  echo "=== Done $(date) ==="
               env:
                 - name: RCLONE_CONFIG
                   value: /config/rclone/rclone.conf
@@ -71,6 +85,6 @@ spec:
             - name: storage
               persistentVolumeClaim: { claimName: paperless-ngx-storage }
             - name: work
-              emptyDir: { sizeLimit: 60Gi }
+              emptyDir: { sizeLimit: 30Gi }
             - name: rclone-config
               secret: { secretName: rclone-config }
