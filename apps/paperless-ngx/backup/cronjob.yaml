@@ -44,7 +44,7 @@ spec:
                 - |
                   set -euo pipefail
                   TS=$(cat /work/TS)
-                  DEST="bitrix:Paperless"
+                  DEST="bitrix-chunked:"
                   echo "=== Start $(date) TS=$TS ==="
 
                   # data (небольшой) — целиком
