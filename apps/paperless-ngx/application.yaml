@@ -1,49 +1,27 @@
 apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
+kind: Application
 metadata:
-  name: rp.store-paperless-ngx
+  name: paperless-ngx
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
-  goTemplate: true
-  goTemplateOptions:
-    - missingkey=error
-  generators:
-    - list:
-        elements:
-          - name: paperless-ngx
-  template:
-    metadata:
-      name: "{{ .name }}"
-      finalizers:
-        - resources-finalizer.argocd.argoproj.io
-    spec:
-      project: default
-      sources:
-        - repoURL: https://pascaliske.github.io/helm-charts
-          chart: paperless
-          targetRevision: "7.0.0"
-          helm:
-            valueFiles:
-              - $values/apps/paperless-ngx/values.yaml
-        - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
-          targetRevision: HEAD
-          ref: values
-        - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
-          targetRevision: HEAD
-          path: apps/paperless-ngx/backup
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: paperless-ngx
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-          allowEmpty: false
-        syncOptions:
-          - CreateNamespace=true
-        retry:
-          limit: 5
-          backoff:
-            duration: 5s
-            factor: 2
-            maxDuration: 3m
+  project: default
+  sources:
+    # 1) Helm-чарт
+    - repoURL: https://pascaliske.github.io/helm-charts
+      chart: paperless
+      targetRevision: "7.0.0"
+      helm:
+        valueFiles:
+          - $values/apps/paperless-ngx/values.yaml
+
+    # 2) Git-репозиторий как ref для values.yaml
+    - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
+      targetRevision: HEAD
+      ref: values
+
+    # 3) Папка с plain-манифестами (CronJob)
+    - repoURL: https://github.com/SharkDeveloper/conversavia-avia-k8s-manifects.git
+      targetRevision: HEAD
+      path: apps/paperless-ngx/backup   # ← директория, а не файл
