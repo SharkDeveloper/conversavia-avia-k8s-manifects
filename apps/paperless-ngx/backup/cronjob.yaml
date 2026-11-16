@@ -90,6 +90,6 @@ spec:
             - name: storage
               persistentVolumeClaim: { claimName: paperless-ngx-storage }
             - name: work
-              emptyDir: { sizeLimit: 40Gi }
+              emptyDir: { sizeLimit:100Gi }
             - name: rclone-config
               secret: { secretName: rclone-config }
