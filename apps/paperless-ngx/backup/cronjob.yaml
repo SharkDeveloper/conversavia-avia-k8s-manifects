@@ -14,6 +14,7 @@ spec:
       activeDeadlineSeconds: 10800
       template:
         spec:
+          ttlSecondsAfterFinished: 86400
           restartPolicy: OnFailure
           nodeSelector:
             kubernetes.io/hostname: convers-avia-k8s-node
