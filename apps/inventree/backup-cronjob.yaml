@@ -39,7 +39,7 @@ spec:
                   rclone delete bitrix:InvenTree  \
                     --include "InvenTree-db-*.psql.bin.gz*" \
                     --include "InvenTree-media-*.tar.gz" \
-                    --min-age 1d \
+                    --min-age 7d \
                     --config /etc/rclone/rclone.conf \
                     --log-level INFO
 
