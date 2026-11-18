@@ -84,7 +84,7 @@ spec:
                 - { name: rclone-config, mountPath: /config/rclone,  readOnly: true }
               resources:
                 requests: { cpu: 200m, memory: 256Mi }
-                limits:   { cpu: 2000m, memory: 2Gi }
+                limits:   { cpu: '2', memory: 2Gi }
           volumes:
             - name: media
               persistentVolumeClaim: { claimName: paperless-ngx-media }
